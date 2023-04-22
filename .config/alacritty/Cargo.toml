@@ -1,0 +1,12 @@
+[workspace]
+members = [
+    "alacritty",
+    "alacritty_terminal",
+    "alacritty_config",
+    "alacritty_config_derive",
+]
+
+[profile.release]
+lto = "thin"
+debug = 1
+incremental = false

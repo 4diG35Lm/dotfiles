@@ -1,4 +1,4 @@
-vim.cmd("autocmd!")
+vim.cmd "autocmd!"
 
 vim.scriptencoding = "utf-8"
 
@@ -6,13 +6,13 @@ vim.wo.number = true
 
 -- LANG
 
-if vim.fn.has("unix") == 1 then
+if vim.fn.has "unix" == 1 then
   vim.env.LANG = "en_US.UTF-8"
 else
   vim.env.LANG = "en"
 end
-vim.cmd([[ "language " .. os.getenv("LANG") ]])
-vim.o.langmenu = os.getenv("LANG")
+vim.cmd [[ "language " .. os.getenv("LANG") ]]
+vim.o.langmenu = os.getenv "LANG"
 
 vim.o.encoding = "utf-8"
 vim.o.fileencodings = "ucs-bom,utf-8,euc-jp,iso-2022-jp,cp932,sjis,latin1"
@@ -25,11 +25,11 @@ vim.o.fileformats = "unix,dos,mac"
 local augroup = vim.api.nvim_create_augroup("vimrc", { clear = true })
 ---vimrc 専用の属性を格納するテーブル
 _G.vimrc = {
-    -- operator
-    op = {},
-    motion = {},
-    omnifunc = {},
-    state = {},
+  -- operator
+  op = {},
+  motion = {},
+  omnifunc = {},
+  state = {},
 }
 
 vim.cmd [[
@@ -66,7 +66,7 @@ local wo = vim.wo
 _G.completion_nvim = {}
 
 function _G.completion_nvim.smart_pumvisible(vis_seq, not_vis_seq)
-  if (fn.pumvisible() == 1) then
+  if fn.pumvisible() == 1 then
     return termcodes(vis_seq)
   else
     return termcodes(not_vis_seq)
@@ -81,14 +81,14 @@ g.airline_powerline_fonts = 1
 g.mapleader = " "
 g.neovide_iso_layout = true
 g.ale_linters = {
-  ['*'] = {'ale_linters'},
-  ['python'] = {'flake8'},
-  ['sh'] = {'shellcheck'},
-  ['zsh'] = {'shellcheck'},
-  ['vim'] = {'vint'},
-  ['lua'] = {'luacheck'},
-  ['go'] = {'golangci-lint'},
-  ['dockerfile'] = {'dockerfile_lint'},
+  ["*"] = { "ale_linters" },
+  ["python"] = { "flake8" },
+  ["sh"] = { "shellcheck" },
+  ["zsh"] = { "shellcheck" },
+  ["vim"] = { "vint" },
+  ["lua"] = { "luacheck" },
+  ["go"] = { "golangci-lint" },
+  ["dockerfile"] = { "dockerfile_lint" },
 }
 
 -- disable default plugins
@@ -126,10 +126,10 @@ for _, name in pairs(disable_plugins) do
   g[name] = true
 end
 
-cmd('filetype off')
-cmd('syntax off')
+cmd "filetype off"
+cmd "syntax off"
 -- eqaul to below setting
-cmd 'autocmd TermOpen * startinsert'
+cmd "autocmd TermOpen * startinsert"
 
 cmd [[
 if executable('fcitx5')
@@ -144,9 +144,9 @@ endif
 ]]
 
 local vars = {
-  python_host_prog = '/usr/bin/python2',
-  python3_host_prog = '$HOME/.anyenv/envs/pyenv/versions/3.11.0/bin/python',
-  loaded_matchparen = 1
+  python_host_prog = "/usr/bin/python2",
+  python3_host_prog = "$HOME/.anyenv/envs/pyenv/versions/3.11.0/bin/python",
+  loaded_matchparen = 1,
 }
 
 for var, val in pairs(vars) do
@@ -167,9 +167,9 @@ cmd [[highlight Normal ctermbg=none]]
 -- vim.g.do_filetype_lua = 1
 -- vim.g.did_load_filetypes = 0
 
-opt.runtimepath:remove("/etc/xdg/nvim")
-opt.runtimepath:remove("/etc/xdg/nvim/after")
-opt.runtimepath:remove("/usr/share/vim/vimfiles")
+opt.runtimepath:remove "/etc/xdg/nvim"
+opt.runtimepath:remove "/etc/xdg/nvim/after"
+opt.runtimepath:remove "/usr/share/vim/vimfiles"
 
 vim.api.nvim_exec(
   [[
@@ -178,5 +178,5 @@ vim.api.nvim_exec(
     endfunction
     au BufEnter NvimTree setlocal statusline=%!DisableST()
   ]],
-    false
+  false
 )

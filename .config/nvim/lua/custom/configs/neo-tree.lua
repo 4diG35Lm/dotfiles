@@ -2,29 +2,20 @@ local status, neo_tree = pcall(require, "neo-tree")
 if not status then
   return
 end
-
--- Unless you are still migrating, remove the deprecated commands from v1.x
-vim.cmd [[ let g:neo_tree_remove_legacy_commands = 1 ]]
 -- See ":help neo-tree-highlights" for a list of available highlight groups
 vim.cmd [[
-        hi link NeoTreeDirectoryName Directory
-        hi link NeoTreeDirectoryIcon NeoTreeDirectoryName
-      ]]
--- If you want icons for diagnostic errors, you'll need to define them somewhere:
-vim.fn.sign_define("DiagnosticSignError", { text = " ", texthl = "DiagnosticSignError" })
-vim.fn.sign_define("DiagnosticSignWarn", { text = " ", texthl = "DiagnosticSignWarn" })
-vim.fn.sign_define("DiagnosticSignInfo", { text = " ", texthl = "DiagnosticSignInfo" })
-vim.fn.sign_define("DiagnosticSignHint", { text = "", texthl = "DiagnosticSignHint" })
--- NOTE: this is changed from v1.x, which used the old style of highlight groups
--- in the form "LspDiagnosticsSignWarning"
+  hi link NeoTreeDirectoryName Directory
+  hi link NeoTreeDirectoryIcon NeoTreeDirectoryName
+]]
+
 neo_tree.setup {
   add_blank_line_at_top = true, --ツリーの最上部に空白行を追加します。
   auto_clean_after_session_restore = false, --セッションに保存された壊れたネオツリー バッファを自動的にクリーンアップします
-  close_if_last_window = false, --それがタブに残された最後のウィンドウである場合、Neo-tree を閉じます
+  close_if_last_window = true, --それがタブに残された最後のウィンドウである場合、Neo-tree を閉じます
+  close_if_last_window = true, -- Close Neo-tree if it is the last window left in the tab
   popup_border_style = "rounded",
   enable_git_status = true,
   enable_diagnostics = true,
-  open_files_do_not_replace_types = { "terminal", "trouble", "qf" }, -- when opening files, do not use windows containing these filetypes or buftypes
   default_component_configs = {
     container = {
       enable_character_fade = true,
@@ -45,6 +36,7 @@ neo_tree.setup {
       folder_closed = "",
       folder_open = "",
       folder_empty = "ﰊ",
+      folder_empty_open = "󰜌",
       default = "*",
       highlight = "NeoTreeFileIcon",
     },
@@ -131,11 +123,6 @@ neo_tree.setup {
         nowait = true,
       },
       mappings = {
-        ["o"] = "open",
-        ["?"] = function(state)
-          local node = state.tree:get_node()
-          print(node.name)
-        end,
         ["<space>"] = {
           "toggle_node",
           nowait = false, -- disable `nowait` if you have existing combos starting with this char that you want to use
@@ -238,7 +225,7 @@ neo_tree.setup {
     },
   },
   source_selector = {
-    winbar = false,
+    winbar = true,
     statusline = false,
   },
   sort_case_insensitive = false, -- used when sorting files and directories in the tree

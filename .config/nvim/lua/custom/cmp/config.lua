@@ -10,10 +10,23 @@ local t = function(str)
   return vim.api.nvim_replace_termcodes(str, true, true, true)
 end
 
+local snip_status_ok, luasnip = pcall(require, "luasnip")
+if not snip_status_ok then
+  return
+end
+
+require("luasnip/loaders/from_vscode").lazy_load()
+
+local check_backspace = function()
+  local col = vim.fn.col "." - 1
+  return col == 0 or vim.fn.getline("."):sub(col, col):match "%s"
+end
+
 local check_back_space = function()
   local col = vim.fn.col "." - 1
   return col == 0 or vim.fn.getline("."):sub(col, col):match "%s" ~= nil
 end
+
 cmp.setup {
   preselect = cmp.PreselectMode.None,
   enabled = function()
@@ -42,6 +55,11 @@ cmp.setup {
   snippet = {
     expand = function(args)
       vim.fn["vsnip#anonymous"](args.body)
+      local luasnip = prequire "luasnip"
+      if not luasnip then
+        return
+      end
+      luasnip.lsp_expand(args.body)
     end,
   },
   callback = function()
@@ -56,7 +74,6 @@ cmp.setup {
       api.set_hl(0, "CmpItemAbbrMatch", { fg = palette.yellow })
       api.set_hl(0, "CmpItemAbbrMatchFuzzy", { fg = palette.orange })
       api.set_hl(0, "CmpItemMenu", { fg = palette.brighter_black, bold = true })
-
       api.set_hl(0, "CmpItemKindText", { fg = palette.blue })
       api.set_hl(0, "CmpItemKindMethod", { fg = palette.magenta })
       api.set_hl(0, "CmpItemKindFunction", { fg = palette.magenta })
@@ -109,7 +126,14 @@ cmp.setup {
   },
 
   sources = cmp.config.sources {
-    { name = "nvim_lsp" },
+    {
+      name = "nvim_lsp",
+      option = {
+        php = {
+          keyword_pattern = [=[[\%(\$\k*\)\|\k\+]]=],
+        },
+      },
+    },
     { name = "nvim_lsp_signature_help" },
     { name = "path" },
     { name = "buffer" },
@@ -158,6 +182,7 @@ cmp.setup {
         space_filter = "-",
       },
     },
+    { name = "luasnip" },
   },
   formatting = {
     format = function(entry, vim_item)

@@ -43,7 +43,6 @@ local plugins = {
         },
         { "weilbith/nvim-lsp-smag" },
         { "nvim-lua/completion-nvim" },
-        -- hrsh7th/cmp-nvim-lsp-signature-help, hrsh7th/cmp-nvim-lsp-document-symbol
         {
           "ray-x/lsp_signature.nvim",
           config = function()
@@ -80,6 +79,9 @@ local plugins = {
             require "custom.configs.mason-lspconfig"
           end,
         },
+        {
+          "jay-babu/mason-null-ls.nvim",
+        },
       },
       config = function()
         require "plugins.configs.lspconfig"
@@ -106,12 +108,10 @@ local plugins = {
       { "cmp-under-comparator" },
       { "L3MON4D3/LuaSnip" },
       { "windwp/nvim-autopairs" },
-      { "hrsh7th/cmp-nvim-lsp" },
-      { "hrsh7th/cmp-nvim-lsp-signature-help" },
-      { "hrsh7th/cmp-nvim-lsp-document-symbol" },
       { "hrsh7th/cmp-buffer" },
       { "hrsh7th/cmp-path" },
       { "hrsh7th/cmp-nvim-lua" },
+      { "hrsh7th/cmp-nvim-lsp" },
       { "hrsh7th/cmp-emoji" },
       { "hrsh7th/cmp-calc" },
       { "f3fora/cmp-spell" },
@@ -167,6 +167,7 @@ local plugins = {
         lazy = true,
       },
       { "folke/neoconf.nvim" },
+      { "quangnguyen30192/cmp-nvim-ultisnips" },
     },
   },
 
@@ -188,15 +189,6 @@ local plugins = {
     end,
   },
   {
-    "bryall/contextprint.nvim",
-    dependencies = {
-      { "nvim-treesitter" },
-    },
-    config = function()
-      require "custom.configs.contextprint"
-    end,
-  },
-  {
     "mizlan/iswap.nvim",
     event = "VimEnter",
     config = function()
@@ -208,15 +200,6 @@ local plugins = {
   --------------------------------
   ----  Treesitter  UI  customize
   { "haringsrob/nvim_context_vt", event = "VimEnter" },
-  {
-    "SmiteshP/nvim-gps",
-    dependencies = {
-      { "nvim-treesitter/nvim-treesitter" },
-    },
-    config = function()
-      require "custom.configs.nvim-gps"
-    end,
-  },
   { "David-Kunz/treesitter-unit", event = "VimEnter" },
   --------------------------------
   ---- telescope.nvim
@@ -233,7 +216,12 @@ local plugins = {
     },
     dependencies = {
       { "dressing.nvim" },
-      { "noice.nvim" },
+      {
+        "noice.nvim",
+        config = function()
+          require("telescope").load_extension "noice"
+        end,
+      },
       { "nvim-web-devicons" },
       { "plenary.nvim" },
       { "popup.nvim" },
@@ -322,6 +310,10 @@ local plugins = {
       --> filer
       {
         "nvim-telescope/telescope-file-browser.nvim",
+        dependencies = {
+          { "nvim-telescope/telescope.nvim" },
+          { "nvim-lua/plenary.nvim" },
+        },
         config = function()
           require("telescope").load_extension "file_browser"
         end,
@@ -378,50 +370,34 @@ local plugins = {
           require("telescope-tabs").setup {}
         end,
       },
+      { "prochri/telescope-all-recent.nvim" },
       {
-        "telescope-search-dir-picker.nvim",
+        "smilovanovic/telescope-search-dir-picker.nvim",
         config = function()
           require("telescope").load_extension "search_dir_picker"
         end,
       },
-      { "prochri/telescope-all-recent.nvim" },
+      {
+        "rcarriga/nvim-notify",
+        config = function()
+          require("telescope").load_extension.notify.notify()
+        end,
+      },
     },
     config = function()
       require "custom.Telescope.config"
-    end,
-  },
-  {
-    "nvim-tree/nvim-tree.lua",
-    enable = false,
-    opts = overrides.nvimtree,
-  },
-
-  -- Install a plugin
-  {
-    "max397574/better-escape.nvim",
-    event = "InsertEnter",
-    config = function()
-      require("better_escape").setup()
     end,
   },
 
   -- To make a plugin not be loaded
   {
     "NvChad/nvim-colorizer.lua",
-    enabled = false,
+    --enabled = false,
   },
 
   { "nvim-lua/plenary.nvim" },
   -- bootstrap
-  { "tani/vim-jetpack", lazy = true },
   { "vim-jp/vimdoc-ja" },
-  {
-    "rmagatti/auto-session",
-    config = function()
-      require "custom.configs.auto-session"
-    end,
-  },
-  { "j-hui/fidget.nvim" },
   ------------------------------------------------------------
   ---- Library
   --------------------------------
@@ -461,10 +437,9 @@ local plugins = {
   },
   ----------------------------------
   ---- ColorScheme
-  { "itchyny/lightline.vim" },
   { "shaunsingh/nord.nvim", lazy = false },
   --------------------------------
-  ---- Filer
+  -- Filer
   {
     "nvim-neo-tree/neo-tree.nvim",
     lazy = false,
@@ -478,6 +453,7 @@ local plugins = {
       },
       { "nvim-tree/nvim-web-devicons" }, -- not strictly required, but recommended
       { "MunifTanjim/nui.nvim" },
+      { "nvim-lua/plenary.nvim" },
     },
     config = function()
       require "custom.configs.neo-tree"
@@ -486,7 +462,6 @@ local plugins = {
   --------------------------------
   ---- Font
   { "nvim-tree/nvim-web-devicons", lazy = false },
-  { "t9md/vim-choosewin" },
   { "Shougo/vimfiler.vim" },
   -- nerdfont
   {
@@ -496,10 +471,6 @@ local plugins = {
       require "custom.configs.nerdfont"
     end, -- Override to setup mason-lspconfig
   },
-  { "lambdalisue/glyph-palette.vim" },
-  { "kosayoda/nvim-lightbulb", dependencies = {
-    { "antoinemadec/FixCursorHold.nvim" },
-  } },
   -- Post-install/update hook with call of vimscript function with argument
   {
     "glacambre/firenvim",
@@ -510,7 +481,6 @@ local plugins = {
     lazy = false,
   },
   --  Editor Config
-  { "editorconfig/editorconfig-vim" },
   {
     "jose-elias-alvarez/null-ls.nvim",
   },
@@ -554,29 +524,6 @@ local plugins = {
   --------------------------------
   ----  Treesitter  UI  customize
   { "haringsrob/nvim_context_vt", event = "VimEnter" },
-  {
-    "SmiteshP/nvim-gps",
-    dependencies = {
-      { "nvim-treesitter/nvim-treesitter" },
-    },
-  },
-  { "npxbr/gruvbox.nvim", dependencies = { "tjdevries/colorbuddy.vim" } },
-  { "tjdevries/colorbuddy.nvim" },
-  { "Shougo/deol.nvim" },
-  {
-    "romgrk/barbar.nvim",
-    dependencies = {
-      { "nvim-tree/nvim-web-devicons" },
-    },
-    config = function()
-      vim.g.bufferline = { icons = "both" }
-    end,
-  },
-  --  paren)
-  { "cohama/lexima.vim" },
-  { "machakann/vim-sandwich" },
-  --  Text  objects
-  { "wellle/targets.vim" },
   --------------------------------------------------------------
   ----  Appearance
   ----------------------------------
@@ -651,14 +598,14 @@ local plugins = {
   { "melkster/modicator.nvim", event = "VimEnter" },
   --------------------------------
   ----  Window  Separators
-  {
-    "nvim-zh/colorful-winsep.nvim",
-    lazy = false,
-    event = "VimEnter",
-    config = function()
-      require "custom.configs.colorful-winsep"
-    end,
-  },
+  --   {
+  --     "nvim-zh/colorful-winsep.nvim",
+  --     lazy = false,
+  --     event = { "WinNew" },
+  --     config = function()
+  --       require "custom.configs.colorful-winsep"
+  --     end,
+  --   },
   --------------------------------
   ----  Menu
   {
@@ -865,8 +812,6 @@ local plugins = {
   --------------------------------
   ----  Tab
   ----------------------------------
-  --  Path  navigation
-  { "justinmk/vim-dirvish" },
   --------------------------------
   ----  Window
   {
@@ -966,7 +911,6 @@ local plugins = {
       require "mkdir"
     end,
   },
-  { "sQVe/sort.nvim", cmd = { "Sort" } },
   { "yutkat/confirm-quit.nvim", event = "VimEnter" },
   --------------------------------
   ----  Commandline
@@ -1038,25 +982,9 @@ local plugins = {
   ----------------------------------
   ----  Writing  assistant
   --  Reading  assistant
-  {
-    "lukas-reineke/indent-blankline.nvim",
-    lazy = false,
-    event = "VimEnter",
-    config = function()
-      require "custom.configs.indent-blankline"
-    end,
-  },
-  {
-    "glepnir/indent-guides.nvim",
-    lazy = false,
-    config = function()
-      require "custom.configs.indent-guides"
-    end,
-  },
   { "kristijanhusak/line-notes.nvim", event = "VimEnter" },
   -------------------------------
   ---  Comment  out
-  { "tyru/caw.vim" },
   {
     "numToStr/Comment.nvim",
     lazy = false,
@@ -1076,9 +1004,7 @@ local plugins = {
       require "custom.configs.autoclose"
     end,
   },
-  { "alvan/vim-closetag" },
   --  focus  mode.  Might  not  ever  it.
-  { "junegunn/goyo.vim" },
   { "tpope/vim-obsession" },
   --------------------------------
   ----  --  Endwise
@@ -1140,6 +1066,7 @@ local plugins = {
     "L3MON4D3/LuaSnip",
     lazy = false,
     event = "VimEnter",
+    build = "make install_jsregexp",
     config = function()
       require "custom.configs.LuaSnip"
     end,
@@ -1148,18 +1075,6 @@ local plugins = {
   { "molleweide/LuaSnip-snippets.nvim", event = "VimEnter" },
   { "rafamadriz/friendly-snippets" },
   --------------------------------
-  ----  Project
-  --   {
-  --     "nvim-tree/nvim-tree.lua",
-  --     dependencies = {
-  --       { "nvim-tree/nvim-web-devicons", lazy = true },
-  --     },
-  --     tag = "nightly",
-  --     lazy = true,
-  --     config = function()
-  --       require "custom.configs.nvim-tree"
-  --     end,
-  --   },
   { "airblade/vim-rooter", event = "VimEnter" },
   {
     "klen/nvim-config-local",
@@ -1179,7 +1094,6 @@ local plugins = {
     end,
   },
   { "akinsho/git-conflict.nvim", event = "VimEnter" },
-  { "yutkat/convert-git-url.nvim", cmd = { "ConvertGitUrl" } },
   {
     "lewis6991/gitsigns.nvim",
     lazy = false,
@@ -1196,9 +1110,6 @@ local plugins = {
       require "custom.configs.diffview"
     end,
   },
-  --------------------------------
-  ----  Git  command  assistant
-  { "rhysd/committia.vim" },
   --------------------------------
   ----  Debugger
   {
@@ -1229,7 +1140,6 @@ local plugins = {
     end,
   },
   --  archived
-  { "Pocco81/DAPInstall.nvim", dependencies = { { "nvim-dap" } } },
   {
     "andrewferrier/debugprint.nvim",
     lazy = false,
@@ -1284,7 +1194,6 @@ local plugins = {
   --------------------------------
   ----  CSV
   ----
-  { "mechatroner/rainbow_csv", ft = { "csv" } },
   --  buggy
   {
     "chen244/csv-tools.lua",
@@ -1296,9 +1205,7 @@ local plugins = {
   },
   --------------------------------
   ----  Json
-  { "neoclide/jsonc.vim", ft = { "json", "jsonc" } },
   --  Rust
-  { "racer-rust/vim-racer" },
   {
     "rust-lang/rust.vim",
     lazy = false,
@@ -1307,15 +1214,6 @@ local plugins = {
     end,
   },
   --  Python
-  { "tmhedberg/SimpylFold", ft = "python" },
-  {
-    "vim-python/python-syntax",
-    ft = "python",
-    config = function()
-      require "custom.configs.python-syntax"
-    end,
-  },
-  { "vito-c/jq.vim" },
   { "wlangstroth/vim-racket" },
   {
     "preservim/vim-markdown",
@@ -1326,33 +1224,27 @@ local plugins = {
   { "justinmk/vim-syntax-extra" },
   { "abhishekmukherg/xonsh-vim" },
   --  JS/TS
-  { "MaxMEllon/vim-jsx-pretty" },
-  { "elzr/vim-json" },
   { "HerringtonDarkholme/yats.vim" },
-  { "antonk52/vim-browserslist" },
   { "Quramy/vison" },
   { "jxnblk/vim-mdx-js" },
   --  HTML
-  { "mattn/emmet-vim" },
   { "posva/vim-vue" },
   { "leafOfTree/vim-svelte-plugin" },
-  { "skwp/vim-html-escape" },
   --  textedit
   { "pedrohdz/vim-yaml-folds" },
-  --  CSS
-  { "hail2u/vim-css3-syntax" },
   --  indent
-  { "f-person/git-blame.nvim" },
-  { "mattn/vim-goimports" },
-  { "folke/tokyonight.nvim" },
-  { "npxbr/glow.nvim", build = ":GlowInstall" },
-  { "mg979/vim-visual-multi", dependencies = { { "kevinhwang91/nvim-hlslens" } } },
   {
-    "prettier/vim-prettier",
+    "lukas-reineke/indent-blankline.nvim",
+    dependencies = {
+      { "nvim-zh/colorful-winsep.nvim" },
+    },
     config = function()
-      require "custom.configs.vim-prettier"
+      require "custom.configs.indent-blankline"
     end,
   },
+  { "f-person/git-blame.nvim" },
+  { "folke/tokyonight.nvim" },
+  { "mg979/vim-visual-multi", dependencies = { { "kevinhwang91/nvim-hlslens" } } },
   {
     "kevinhwang91/nvim-ufo",
     lazy = false,
@@ -1373,7 +1265,6 @@ local plugins = {
     end,
   },
   --  outline
-  { "mpeterv/luacheck" },
   {
     "kdheepak/tabline.nvim",
     lazy = false,
@@ -1390,9 +1281,6 @@ local plugins = {
   { "folke/neodev.nvim", lazy = false },
   --  general  plugins
   { "Shougo/vimproc.vim" },
-  { "Vimjas/vim-python-pep8-indent" },
-  { "glidenote/memolist.vim" },
-  { "itchyny/vim-qfedit" },
   {
     "ahmedkhalf/project.nvim",
     lazy = false,
@@ -1409,42 +1297,15 @@ local plugins = {
     end,
   },
   --  Search
-  { "romainl/vim-cool" },
   --  Load  on  an  autocommand  event
   { "andymass/vim-matchup", event = "VimEnter" },
-  --  Lisps
-  { "gpanders/nvim-parinfer" },
-  --  Undo  tree
-  {
-    "mbbill/undotree",
-    cmd = "UndotreeToggle",
-    config = function()
-      vim.g.undotree_SetFocusWhenToggle = 1
-    end,
-  },
   --  Post-install/update  hook  with  call  of  vimscript  function  with  argument
   { "ziontee113/color-picker.nvim" },
   --  nerdfont
   { "antoinemadec/FixCursorHold.nvim" },
-  { "pangloss/vim-javascript" },
-  --  Never  remember  what  register  contains  what?  vim-peekaboo  to  the  rescue
-  { "junegunn/vim-peekaboo" },
   --  focus  mode.  Might  not  ever  it.
   --  Git
-  {
-    "dinhhuy258/git.nvim",
-    config = function()
-      require "custom.configs.git"
-    end,
-  },
-  { "tpope/vim-fugitive" },
   { "tpope/vim-rhubarb" },
-  { "sgeb/vim-diff-fold" },
-  --  auto  format  files.  E.g.  format  js  files  using  typescript.
-  { "mhartington/formatter.nvim" },
-  { "airblade/vim-gitgutter" },
-  { "hrsh7th/nvim-compe" },
-  { "mattn/efm-langserver" },
   --  filetype
   {
     "nathom/filetype.nvim",
@@ -1453,18 +1314,15 @@ local plugins = {
       require "custom.configs.filetype"
     end,
   },
-  { "JuliaEditorSupport/julia-vim" },
-  { "aklt/plantuml-syntax" },
-  { "bfontaine/Brewfile.vim" },
   { "cespare/vim-toml" },
-  { "chr4/nginx.vim" },
-  { "ekalinin/Dockerfile.vim" },
-  { "leafgarland/typescript-vim" },
   { "ocaml/vim-ocaml" },
-  { "pest-parser/pest.vim" },
-  { "vito-c/jq.vim" },
   { "wlangstroth/vim-racket" },
   { "justinmk/vim-syntax-extra" },
+  --  -- copilot
+  --  {
+  --    "github/copilot.vim",
+  --    lazy = false,
+  --  },
 }
 
 return plugins

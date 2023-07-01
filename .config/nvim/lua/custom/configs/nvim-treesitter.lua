@@ -13,9 +13,6 @@ require("nvim-treesitter.configs").setup {
   autotag = {
     enable = true,
   },
-  indent = {
-    enable = true,
-  },
   -- And optionally, disable the conflict warning emitted by plugin
   yati = {
     enable = true,

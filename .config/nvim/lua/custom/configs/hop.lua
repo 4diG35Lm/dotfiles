@@ -1,28 +1,18 @@
 local status, hop = pcall(require, "hop")
-if (not status) then return end
-hop.setup({})
-
-vim.api.nvim_set_keymap(
-	"n",
-	"SS",
-	"<cmd>lua require'hop'.hint_words({ direction = require'hop.hint'.HintDirection.BEFORE_CURSOR })<CR>",
-	{}
-)
-vim.api.nvim_set_keymap(
-	"n",
-	"Ss",
-	"<cmd>lua require'hop'.hint_words({ direction = require'hop.hint'.HintDirection.AFTER_CURSOR })<CR>",
-	{}
-)
-vim.api.nvim_set_keymap(
-	"x",
-	"SS",
-	"<cmd>lua require'hop'.hint_words({ direction = require'hop.hint'.HintDirection.BEFORE_CURSOR })<CR>",
-	{}
-)
-vim.api.nvim_set_keymap(
-	"x",
-	"Ss",
-	"<cmd>lua require'hop'.hint_words({ direction = require'hop.hint'.HintDirection.AFTER_CURSOR })<CR>",
-	{}
-)
+if not status then
+  return
+end
+local directions = hop.hint.HintDirection
+hop.setup()
+vim.keymap.set("", "f", function()
+  hop.hint_char1 { direction = directions.AFTER_CURSOR, current_line_only = true }
+end, { remap = true })
+vim.keymap.set("", "F", function()
+  hop.hint_char1 { direction = directions.BEFORE_CURSOR, current_line_only = true }
+end, { remap = true })
+vim.keymap.set("", "t", function()
+  hop.hint_char1 { direction = directions.AFTER_CURSOR, current_line_only = true, hint_offset = -1 }
+end, { remap = true })
+vim.keymap.set("", "T", function()
+  hop.hint_char1 { direction = directions.BEFORE_CURSOR, current_line_only = true, hint_offset = 1 }
+end, { remap = true })

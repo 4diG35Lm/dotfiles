@@ -181,7 +181,9 @@ local settings = {
 mason.setup(settings)
 mason_lspconfig.setup_handlers {
   function(server_name)
-    local opts = {}
+    local opts = {
+      capabilities = require("cmp_nvim_lsp").default_capabilities(),
+    }
     opts.on_attach = function(_, bufnr)
       local bufopts = { silent = true, buffer = bufnr }
       vim.keymap.set("n", "gi", vim.lsp.buf.implementation, bufopts)

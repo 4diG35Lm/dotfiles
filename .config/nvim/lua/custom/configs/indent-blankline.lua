@@ -5,11 +5,12 @@
 -- Plugin: indent-blankline
 -- url: https://github.com/lukas-reineke/indent-blankline.nvim
 
-local status_ok, indent_blankline = pcall(require, 'indent_blankline')
+local status_ok, indent_blankline = pcall(require, "indent_blankline")
 if not status_ok then
   return
 end
 vim.opt.termguicolors = true
+
 vim.cmd [[highlight IndentBlanklineIndent1 guifg=#E06C75 gui=nocombine]]
 vim.cmd [[highlight IndentBlanklineIndent2 guifg=#E5C07B gui=nocombine]]
 vim.cmd [[highlight IndentBlanklineIndent3 guifg=#98C379 gui=nocombine]]
@@ -21,47 +22,18 @@ vim.opt.list = true
 vim.opt.listchars:append "space:⋅"
 vim.opt.listchars:append "eol:↴"
 indent_blankline.setup {
-	space_char_blankline = " ",
-	show_current_context = true,
-  show_current_context_start = true,--
+  show_end_of_line = true,
+  space_char_blankline = " ",
+  show_current_context = true,
+  show_current_context_start = true, --
   use_treesitter = true,
   show_first_indent_level = true,
---   filetype_exclude = {
--- 		'NvimTree',
--- 		'alpha',
--- 		'coc-explorer',
--- 		'dap-repl',
--- 		'dapui_breakpoints',
--- 		'dapui_scopes',
--- 		'dapui_stacks',
--- 		'dapui_watches',
--- 		'dashboard',
--- 		'dashpreview',
--- 		'help',
--- 		'lazy',
--- 		'log',
--- 		'lspinfo',
--- 		'lspsagafinder',
--- 		'neo-tree',
--- 		'packer',
--- 		'sagahover',
--- 		'sagasignature',
--- 		'toggleterm',
--- 		'vista',
---     'checkhealth',
---     'dashboard',
---     'git',
---     'man',
---     'markdown',
---     'terminal',
---     'text',
--- 	},
--- 	buftype_exclude = {
--- 	  'terminal',
--- 	  'nofile',
--- 	  'quickfix',
--- 	  'prompt',
--- 	},
+  -- 	buftype_exclude = {
+  -- 	  'terminal',
+  -- 	  'nofile',
+  -- 	  'quickfix',
+  -- 	  'prompt',
+  -- 	},
   char_highlight_list = {
     "IndentBlanklineIndent1",
     "IndentBlanklineIndent2",
@@ -70,7 +42,7 @@ indent_blankline.setup {
     "IndentBlanklineIndent5",
     "IndentBlanklineIndent6",
   },
-	show_trailing_blankline_indent = false,
+  show_trailing_blankline_indent = false,
 }
 
--- vim.api.nvim_clear_autocmds({ event = { "TextChanged", "TextChangedI" }, group = "IndentBlanklineAutogroup" })
+--vim.api.nvim_clear_autocmds { event = { "TextChanged", "TextChangedI" }, group = "IndentBlanklineAutogroup" }

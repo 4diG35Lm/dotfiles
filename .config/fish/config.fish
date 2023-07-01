@@ -1,15 +1,14 @@
-# fish 起動時のメッセージを削除
+# fish
 function fish_greeting
   echo ""
 end
 
-# cd コマンド実行後に ls コマンドを実行するように override
 function cd
   builtin cd $argv
     ls -a
 end
 
-# ls に color を設定
+# ls
 if test ! -e ~/.dircolors/dircolors.ansi-dark
   git clone https://github.com/seebi/dircolors-solarized.git ~/.dircolors
 end
@@ -26,16 +25,16 @@ set fish_theme dracula
 set -g theme_powerline_fonts no
 set -g theme_nerd_fonts yes
 # }}}
-# ｿｿｿｿｿｿｿｿｿｿｿｿ {{{
+# {{{
 set -g theme_display_cmd_duration yes
 # }}}
-# shellｿｿｿｿｿｿｿｿｿｿｿｿｿｿｿｿ {{{
+# shell{{{
 set -g theme_title_display_user no
 set -g theme_title_display_process yes
 set -g theme_title_display_path no
 # }}}
 
-# exitｿｿｿｿｿｿｿｿ{{{
+# exit{{{
 set -g theme_show_exit_status yes
 # }}}
 
@@ -63,19 +62,13 @@ set -x PATH $HOME/.anyenv/bin $PATH
 eval (anyenv init - fish | source)
 set -U FZF_LEGACY_KEYBINDINGS 0
 set -U FZF_REVERSE_ISEARCH_OPTS "--reverse --height=100%"
-#for i in (ls $HOME/.anyenv/envs);
-#  set -x PATH $HOME/.anyenv/envs/$i/bin $PATH
-#  eval ($i init - fish | source)
-#  set -U fish_user_paths $HOME/.anyenv/envs/$i/versions/($i global)/bin $fish_user_paths
-#  set -U fish_user_paths (echo $fish_user_paths | tr ' ' '\n' | sort -u)
-#end
 # }}}
 # pyenv {{{
-while set pyenv_index (contains -i -- "/home/a2c/.anyenv/envs/pyenv/shims" $PATH)
+while set pyenv_index (contains -i -- "$HOME/.anyenv/envs/pyenv/shims" $PATH)
 set -eg PATH[$pyenv_index]; end; set -e pyenv_index
-set -gx PATH '/home/a2c/.anyenv/envs/pyenv/shims' $PATH
+set -gx PATH '$HOME/.anyenv/envs/pyenv/shims' $PATH
 set -gx PYENV_SHELL fish
-source '/home/a2c/.anyenv/envs/pyenv/libexec/../completions/pyenv.fish'
+source $HOME/.anyenv/envs/pyenv/libexec/../completions/pyenv.fish
 command pyenv rehash 2>/dev/null
 function pyenv
   set command $argv[1]
@@ -95,7 +88,7 @@ set -gx GOENV_ROOT /home/a2c/.anyenv/envs/goenv
 if not contains $GOENV_ROOT/shims $PATH
   set -gx PATH $PATH $GOENV_ROOT/shims
 end
-source '/home/a2c/.anyenv/envs/goenv/libexec/../completions/goenv.fish'
+source $HOME/.anyenv/envs/goenv/libexec/../completions/goenv.fish
 command goenv rehash 2>/dev/null
 function goenv
   set command $argv[1]
@@ -109,11 +102,10 @@ function goenv
   end
 end
 goenv rehash --only-manage-paths
-
 #}}}
 
 # nodenv {{{
-set -gx PATH '/home/a2c/.anyenv/envs/nodenv/shims' $PATH
+set -gx PATH '$HOME/.anyenv/envs/nodenv/shims' $PATH
 set -gx NODENV_SHELL fish
 command nodenv rehash 2>/dev/null
 function nodenv
@@ -157,7 +149,7 @@ set_color normal
 
 # opam {{{
 set -U fish_user_paths $fish_user_paths $HOME/.opam/default/bin
-source /home/a2c/.opam/opam-init/init.fish > /dev/null 2> /dev/null; or true
+source $HOME/.opam/opam-init/init.fish > /dev/null 2> /dev/null; or true
 # }}}
 
 #RUST {{{
@@ -227,49 +219,6 @@ function fish_user_key_bindings
   bind \c] peco_select_ghq_repository
   bind \cx\cr peco_recentd
 end
-function index2levels4chroma -d "色インデックスを空白区切りにした3つのレベル値に変換"
-    set -l index $argv[1] # ローカル変数の設定
 
-    # 赤レベルの算出
-    set -l red_level (math "$index / (6 ^ 2)")
-    test $red_level -ge 6 # 6以上のとき
-        and set red_level 5
-
-    # 緑レベルの算出
-    set -l green_level (math "($index - (6 ^ 2) * $red_level) / 6")
-    test $grenn_level -ge 6
-        and set green_level 5
-
-    # 青レベルの算出
-    set -l blue_level (math "$index - (6 ^ 2) * $red_level - 6 * $green_level")
-
-    printf '%d %d %d' $red_level $green_level $blue_level
-end
-
-function level2hex4chroma -d "レベル値を16進数の明度値のコードに変換"
-    switch $argv[1]
-        case 0
-            printf 00
-        case 1 2 3 4 5
-            printf '%02x' (math "95 + 40 * ($argv[1] - 1)")
-    end
-end
-
-function index2code4chroma -d "色インデックスを24bitコードへ変換(有彩色用)"
-    set -l levels (index2levels4chroma $argv[1])
-    set -l list (string split ' ' "$levels")
-    printf '#%s%s%s' \
-        (level2hex4chroma $list[1]) \
-        (level2hex4chroma $list[2]) \
-        (level2hex4chroma $list[3])
-end
-function index2code4monochroma -d "色インデックスを24bitコードへ変換(無彩色用)"
-    set -l level (math "$argv[1] - 232")
-    set -l dec   (math "10 * $level + 8")
-    printf '#%02x%02x%02x' $dec $dec $dec
-end
 # }}}
-# node-debug2 {{{
-set -x NODE_OPTIONS "--no-experimental-fetch npm run build"
-#}}}
 source (/usr/local/bin/starship init fish --print-full-init | psub)

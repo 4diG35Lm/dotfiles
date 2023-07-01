@@ -5,151 +5,25 @@ end
 
 local fn, uv, api = require("custom.core.utils").globals()
 local keymap = vim.keymap
-local actions = require "telescope.actions"
-local action_layout = require "telescope.actions.layout"
-local config = require "telescope.config"
-local finders = require "telescope.finders"
-local make_entry = require "telescope.make_entry"
-local previewers = require "telescope.previewers"
-local utils = require "telescope.utils"
-local conf = require("telescope.config").values
-local telescope_builtin = require "telescope.builtin"
 local Path = require "plenary.path"
-local trouble = require "trouble.providers.telescope"
+local action_layout = require "telescope.actions.layout"
+local actions = require "telescope.actions"
+local actions_state = require "telescope.actions.state"
+local conf = require("telescope.config").values
+local config = require "telescope.config"
+local fb_actions = require "telescope._extensions.file_browser.actions"
+local finders = require "telescope.finders"
+local from_entry = require "telescope.from_entry"
+local make_entry = require "telescope.make_entry"
 local palette = require("custom.core.utils.palette").nord
+local previewers = require "telescope.previewers"
+local telescope_builtin = require "telescope.builtin"
+local trouble = require "trouble.providers.telescope"
+local utils = require "telescope.utils"
 
 local action_state = require "telescope.actions.state"
 local transform_mod = require("telescope.actions.mt").transform_mod
 
-require("telescope-all-recent").setup {
-  database = {
-    folder = vim.fn.stdpath "data",
-    file = "telescope-all-recent.sqlite3",
-    max_timestamps = 10,
-  },
-  scoring = {
-    recency_modifier = { -- also see telescope-frecency for these settings
-      [1] = { age = 240, value = 100 }, -- past 4 hours
-      [2] = { age = 1440, value = 80 }, -- past day
-      [3] = { age = 4320, value = 60 }, -- past 3 days
-      [4] = { age = 10080, value = 40 }, -- past week
-      [5] = { age = 43200, value = 20 }, -- past month
-      [6] = { age = 129600, value = 10 }, -- past 90 days
-    },
-    -- how much the score of a recent item will be improved.
-    boost_factor = 0.0001,
-  },
-  default = {
-    disable = true, -- disable any unkown pickers (recommended)
-    use_cwd = true, -- differentiate scoring for each picker based on cwd
-    sorting = "recent", -- sorting: options: 'recent' and 'frecency'
-  },
-  --   pickers = { -- allows you to overwrite the default settings for each picker
-  --     man_pages = { -- enable man_pages picker. Disable cwd and use frecency sorting.
-  --       disable = false,
-  --       use_cwd = false,
-  --       sorting = "frecency",
-  --     },
-  --
-  --     -- change settings for a telescope extension.
-  --     -- To find out about extensions, you can use `print(vim.inspect(require'telescope'.extensions))`
-  --     ["extension_name#extension_method"] = {
-  --       -- [...]
-  --     },
-  --   },
-}
-local function multiopen(prompt_bufnr, method)
-  local edit_file_cmd_map = {
-    vertical = "vsplit",
-    horizontal = "split",
-    tab = "tabedit",
-    default = "edit",
-  }
-  local edit_buf_cmd_map = {
-    vertical = "vert sbuffer",
-    horizontal = "sbuffer",
-    tab = "tab sbuffer",
-    default = "buffer",
-  }
-  local picker = action_state.get_current_picker(prompt_bufnr)
-  local multi_selection = picker:get_multi_selection()
-
-  if #multi_selection > 1 then
-    require("telescope.pickers").on_close_prompt(prompt_bufnr)
-    pcall(vim.api.nvim_set_current_win, picker.original_win_id)
-
-    for i, entry in ipairs(multi_selection) do
-      local filename, row, col
-
-      if entry.path or entry.filename then
-        filename = entry.path or entry.filename
-
-        row = entry.row or entry.lnum
-        col = vim.F.if_nil(entry.col, 1)
-      elseif not entry.bufnr then
-        local value = entry.value
-        if not value then
-          return
-        end
-
-        if type(value) == "table" then
-          value = entry.display
-        end
-
-        local sections = vim.split(value, ":")
-
-        filename = sections[1]
-        row = tonumber(sections[2])
-        col = tonumber(sections[3])
-      end
-
-      local entry_bufnr = entry.bufnr
-
-      if entry_bufnr then
-        if not vim.api.nvim_buf_get_option(entry_bufnr, "buflisted") then
-          vim.api.nvim_buf_set_option(entry_bufnr, "buflisted", true)
-        end
-        local command = i == 1 and "buffer" or edit_buf_cmd_map[method]
-        pcall(vim.cmd, string.format("%s %s", command, vim.api.nvim_buf_get_name(entry_bufnr)))
-      else
-        local command = i == 1 and "edit" or edit_file_cmd_map[method]
-        if vim.api.nvim_buf_get_name(0) ~= filename or command ~= "edit" then
-          filename = require("plenary.path"):new(vim.fn.fnameescape(filename)):normalize(vim.loop.cwd())
-          pcall(vim.cmd, string.format("%s %s", command, filename))
-        end
-      end
-
-      if row and col then
-        pcall(vim.api.nvim_win_set_cursor, 0, { row, col })
-      end
-    end
-  else
-    actions["select_" .. method](prompt_bufnr)
-  end
-end
-
-local custom_actions = transform_mod {
-  multi_selection_open_vertical = function(prompt_bufnr)
-    multiopen(prompt_bufnr, "vertical")
-  end,
-  multi_selection_open_horizontal = function(prompt_bufnr)
-    multiopen(prompt_bufnr, "horizontal")
-  end,
-  multi_selection_open_tab = function(prompt_bufnr)
-    multiopen(prompt_bufnr, "tab")
-  end,
-  multi_selection_open = function(prompt_bufnr)
-    multiopen(prompt_bufnr, "default")
-  end,
-}
-
-local function use_normal_mapping(key)
-  return function()
-    vim.cmd.stopinsert()
-    local key_code = vim.api.nvim_replace_termcodes(key, true, false, true)
-    vim.api.nvim_feedkeys(key_code, "m", false)
-  end
-end
 api.create_autocmd("ColorScheme", {
   group = api.create_augroup("telescope-colors", {}),
   pattern = "nord",
@@ -160,10 +34,8 @@ api.create_autocmd("ColorScheme", {
     api.set_hl(0, "TelescopeResultsBorder", { fg = palette.blue })
     api.set_hl(0, "TelescopeSelection", { fg = palette.blue })
     api.set_hl(0, "TelescopeSelectionCaret", { fg = palette.blue })
-
     api.set_hl(0, "TelescopeBufferLoaded", { fg = palette.magenta })
     api.set_hl(0, "TelescopePathSeparator", { fg = palette.brighter_black })
-    -- api.set_hl(0, "TelescopeFrecencyScores", { fg = palette.yellow })
     api.set_hl(0, "TelescopeQueryFilter", { fg = palette.bright_cyan })
   end,
 })
@@ -186,6 +58,12 @@ local function extensions(name, prop)
   end
 end
 
+for k, v in pairs(require "telescope.builtin") do
+  if type(v) == "function" then
+    vim.keymap.set("n", "<Plug>(telescope." .. k .. ")", v)
+  end
+end
+
 -- Lines
 keymap.set("n", "#", builtin "current_buffer_fuzzy_find" {})
 
@@ -196,17 +74,12 @@ keymap.set("n", "<Leader>fb", function()
   extensions("file_browser", "file_browser") { cwd = cwd == "" and nil or cwd }()
 end)
 keymap.set("n", "<Leader>ff", function()
+  local Path = require "plenary.path"
   -- TODO: stopgap measure
   if uv.cwd() == uv.os_homedir() then
-    api.echo({
-      {
-        "find_files on $HOME is danger. Launch file_browser instead.",
-        "WarningMsg",
-      },
-    }, true, {})
+    vim.notify("find_files on $HOME is danger. Launch file_browser instead.", vim.log.levels.WARN)
     extensions("file_browser", "file_browser") {}()
-    -- TODO: use uv.fs_stat ?
-  elseif fn.isdirectory(uv.cwd() .. "/.git") == 1 then
+  elseif Path:new(uv.cwd() .. "/.git"):is_dir() then
     builtin "git_files" { show_untracked = true }()
   else
     builtin "find_files" { hidden = true }()
@@ -233,7 +106,6 @@ keymap.set("n", "<Leader>fg", input_grep_string("Grep For ❯ ", builtin "grep_s
 keymap.set("n", "<Leader>fh", builtin "help_tags" {})
 keymap.set("n", "<Leader>fm", builtin "man_pages" { sections = { "ALL" } })
 keymap.set("n", "<Leader>fn", extensions("noice", "noice") {})
---keymap.set("n", "<Leader>fo", extensions("frecency", "frecency") { path_display = frecency.path_display })
 keymap.set("n", "<Leader>fp", extensions("projects", "projects") {})
 keymap.set(
   "n",
@@ -286,7 +158,7 @@ keymap.set("n", "<Leader>fz", function()
         end)
       end,
     },
-  }
+  }()
 end)
 
 -- Memo
@@ -316,38 +188,24 @@ keymap.set(
   { silent = true }
 )
 
--- for telescope-frecency
--- api.create_autocmd({ "BufWinEnter", "BufWritePost" }, {
---   group = api.create_augroup("TelescopeFrecency", {}),
---   callback = function(args)
---     local path = args.match
---     if path and path ~= "" then
---       local st = uv.fs_stat(path)
---       if st then
---         local db_client = require "telescope._extensions.frecency.db_client"
---         db_client.init(nil, nil, true, true)
---         db_client.autocmd_handler(args.match)
---       end
---     end
---   end,
--- })
+local run_in_dir = function(name)
+  return function()
+    local source = require("telescope.builtin")[name]
+    local entry = actions_state.get_selected_entry()
+    local dir = from_entry.path(entry)
+    if fn.isdirectory(dir) then
+      source { cwd = dir }
+    else
+      vim.notify(("This is not a directory: %s"):format(dir), vim.log.levels.ERROR)
+    end
+  end
+end
 
-telescope.load_extension "file_browser"
--- This is needed to setup telescope-frecency.
--- telescope.load_extension "frecency"
--- This is needed to setup telescope-fzf-native. It overrides the sorters
--- in this.
-telescope.load_extension "fzf"
---	This is needed to setup telescope-smart-history.
-telescope.load_extension "smart_history"
--- This is needed to setup projects.nvim
-telescope.load_extension "projects"
--- This is needed to setup noice.nvim
-telescope.load_extension "noice"
--- This is needed to setup yanky
-telescope.load_extension "yank_history"
-
-require("dressing").setup {}
+local preview_scroll = function(direction)
+  return function(prompt_bufnr)
+    actions.get_current_picker(prompt_bufnr).previewer:scroll_fn(direction)
+  end
+end
 
 telescope.setup {
   defaults = {
@@ -359,7 +217,7 @@ telescope.setup {
       "--line-number",
       "--column",
       "--smart-case",
-    },
+    }, --column
   },
   prompt_prefix = "> ",
   selection_caret = "> ",
@@ -386,7 +244,6 @@ telescope.setup {
   file_sorter = require("telescope.sorters").get_fuzzy_file,
   file_ignore_patterns = { "node_modules/*" },
   generic_sorter = require("telescope.sorters").get_generic_fuzzy_sorter,
-  path_display = { "truncate" },
   dynamic_preview_title = true,
   winblend = 0,
   border = {},
@@ -410,112 +267,134 @@ telescope.setup {
   -- Developer configurations: Not meant for general override
   buffer_previewer_maker = require("telescope.previewers").buffer_previewer_maker,
   mappings = {
-    n = {
-      ["<C-t>"] = action_layout.toggle_preview,
-      ["<C-v>"] = use_normal_mapping "<C-v>",
-      ["<C-s>"] = use_normal_mapping "<C-s>",
-      ["<CR>"] = use_normal_mapping "<CR>",
-      ["<c-e>"] = trouble.open_with_trouble,
-    },
     i = {
-      ["<C-t>"] = action_layout.toggle_preview,
-      ["<C-x>"] = false,
-      -- ["<C-s>"] = actions.select_horizontal,
-      ["<Tab>"] = actions.toggle_selection + actions.move_selection_next,
-      ["<C-q>"] = actions.send_selected_to_qflist,
-      -- ["<CR>"] = actions.select_default + actions.center,
-      ["<C-g>"] = custom_actions.multi_selection_open,
-      ["<C-v>"] = custom_actions.multi_selection_open_vertical,
-      ["<C-s>"] = custom_actions.multi_selection_open_horizontal,
-      -- ["<C-t>"] = custom_actions.multi_selection_open_tab,
-      ["<CR>"] = custom_actions.multi_selection_open,
-      ["<c-e>"] = trouble.open_with_trouble,
+      ["<C-a>"] = run_in_dir "find_files",
+      ["<C-c>"] = actions.close,
+      ["<C-g>"] = run_in_dir "live_grep",
+      ["<C-j>"] = actions.move_selection_next,
+      ["<C-k>"] = actions.move_selection_previous,
+      ["<C-s>"] = actions.select_horizontal,
+      ["<C-n>"] = actions.cycle_history_next,
+      ["<C-p>"] = actions.cycle_history_prev,
+      ["<C-d>"] = actions.preview_scrolling_down,
+      ["<C-u>"] = actions.preview_scrolling_up,
+      ["<C-l>"] = actions.send_to_loclist + actions.open_loclist,
+      ["<M-l>"] = actions.send_selected_to_loclist + actions.open_loclist,
     },
+    n = {
+      ["<Space>"] = actions.toggle_selection,
+      ["<C-a>"] = run_in_dir "find_files",
+      ["<C-b>"] = actions.results_scrolling_up,
+      ["<C-c>"] = actions.close,
+      ["<C-f>"] = actions.results_scrolling_down,
+      ["<C-g>"] = run_in_dir "live_grep",
+      ["<C-j>"] = actions.move_selection_next,
+      ["<C-k>"] = actions.move_selection_previous,
+      ["<C-s>"] = actions.select_horizontal,
+      ["<C-n>"] = actions.select_horizontal,
+      ["<C-d>"] = preview_scroll(3),
+      ["<C-u>"] = preview_scroll(-3),
+      ["<C-l>"] = actions.send_to_loclist + actions.open_loclist,
+      ["<M-l>"] = actions.send_selected_to_loclist + actions.open_loclist,
+    },
+  },
+  history = {
+    path = Path:new(fn.stdpath "data", "telescope_history.sqlite3").filename,
+    limit = 100,
   },
   hijack_netrw = true,
   dir_icon_hl = "Directory",
   icon_width = 2,
   path_display = { "shorten", "smart" },
   respect_gitignore = false,
-  layout_config = {
-    height = function(_, _, max_lines)
-      return math.max(math.floor(max_lines / 2), 5)
-    end,
-  },
   fzf = {
     fuzzy = true,
     override_generic_sorter = true,
     override_file_sorter = true,
     case_mode = "smart_case",
   },
-  history = { path = vim.fn.stdpath "state" .. "/databases/telescope_history.sqlite3", limit = 100 },
   extensions = {
-    media_files = {
-      filetypes = { "png", "webp", "jpg", "jpeg" }, -- filetypes whitelist
-      find_cmd = "rg", -- find command
-    },
-    arecibo = {
-      ["selected_engine"] = "google",
-      ["url_open_command"] = "xdg-open",
-      ["show_http_headers"] = false,
-      ["show_domain_icons"] = false,
-    },
-    frecency = {
-      db_root = vim.fn.stdpath "state",
-      ignore_patterns = { "*.git/*", "*/tmp/*", "*/node_modules/*" },
-      db_safe_mode = false,
-      auto_validate = true,
-    },
-    project = {
-      base_dirs = function()
-        local dirs = {}
-        local function file_exists(fname)
-          local stat = vim.loop.fs_stat(vim.fn.expand(fname))
-          return (stat and stat.type) or false
-        end
-
-        if file_exists "~/.ghq" then
-          dirs[#dirs + 1] = { "~/.ghq", max_depth = 5 }
-        end
-        if file_exists "~/Workspace" then
-          dirs[#dirs + 1] = { "~/Workspace", max_depth = 3 }
-        end
-        if #dirs == 0 then
-          return nil
-        end
-        return dirs
-      end,
-    },
-    undo = {
-      side_by_side = true,
-      layout_strategy = "vertical",
-      layout_config = {
-        preview_height = 0.8,
+    file_browser = {
+      mappings = {
+        i = {
+          ["<A-d>"] = fb_actions.remove,
+          ["<A-e>"] = fb_actions.create, -- Original: <A-c>
+          ["<A-g>"] = fb_actions.goto_parent_dir, -- Original: <C-g>
+          ["<A-h>"] = fb_actions.toggle_hidden, -- Original: <C-h>
+          ["<A-m>"] = fb_actions.move,
+          ["<A-r>"] = fb_actions.rename,
+          ["<A-s>"] = fb_actions.toggle_all, -- Original: <C-s>
+          ["<A-y>"] = fb_actions.copy,
+          ["<C-a>"] = run_in_dir "find_files",
+          ["<C-d>"] = preview_scroll(3),
+          ["<C-e>"] = fb_actions.goto_home_dir,
+          ["<C-f>"] = fb_actions.toggle_browser,
+          ["<C-g>"] = run_in_dir "live_grep",
+          ["<C-n>"] = actions.select_horizontal,
+          ["<C-o>"] = fb_actions.open,
+          ["<C-s>"] = actions.select_horizontal,
+          ["<C-t>"] = fb_actions.change_cwd,
+          ["<C-u>"] = preview_scroll(-3),
+          ["<C-w>"] = fb_actions.goto_cwd,
+        },
+        n = {
+          ["<C-a>"] = run_in_dir "find_files",
+          ["<C-d>"] = preview_scroll(3),
+          ["<C-g>"] = run_in_dir "live_grep",
+          ["<C-u>"] = preview_scroll(-3),
+          ["c"] = fb_actions.create,
+          ["d"] = fb_actions.remove,
+          ["e"] = fb_actions.goto_home_dir,
+          ["f"] = fb_actions.toggle_browser,
+          ["g"] = fb_actions.goto_parent_dir,
+          ["h"] = fb_actions.toggle_hidden,
+          ["m"] = fb_actions.move,
+          ["o"] = fb_actions.open,
+          ["r"] = fb_actions.rename,
+          ["s"] = fb_actions.toggle_all,
+          ["t"] = fb_actions.change_cwd,
+          ["w"] = fb_actions.goto_cwd,
+          ["y"] = fb_actions.copy,
+        },
       },
+      theme = "ivy",
+      hijack_netrw = true,
+      dir_icon_hl = "Directory",
+      icon_width = 2,
+      path_display = { "shorten", "smart" },
+      respect_gitignore = false,
+      layout_config = {
+        height = function(_, _, max_lines)
+          return math.max(math.floor(max_lines / 2), 5)
+        end,
+      },
+    },
+    fzf = {
+      fuzzy = true,
+      override_generic_sorter = true,
+      override_file_sorter = true,
+      case_mode = "smart_case",
     },
   },
 }
+telescope.load_extension "file_browser"
+-- This is needed to setup telescope-frecency.
+-- in this.
+telescope.load_extension "fzf"
+-- This is needed to setup telescope-smart-history.
+telescope.load_extension "smart_history"
+-- This is needed to setup projects.nvim
+telescope.load_extension "projects"
+-- This is needed to setup noice.nvim
+telescope.load_extension "noice"
+-- This is needed to setup yanky
+telescope.load_extension "yank_history"
 
 -- Set mappings for yanky here to avoid cycle referencing
 local utils = require "yanky.utils"
 local mapping = require "yanky.telescope.mapping"
 local options = require("yanky.config").options
--- options.picker.telescope.mappings =
---   {
---     default = mapping.put "p",
---     i = {
---       ["<A-p>"] = mapping.put "p",
---       ["<A-P>"] = mapping.put "P",
---       ["<A-d>"] = mapping.delete(),
---       ["<A-r>"] = mapping.set_register(utils.get_default_register()),
---     },
---     n = {
---       p = mapping.put "p",
---       P = mapping.put "P",
---       d = mapping.delete(),
---       r = mapping.set_register(utils.get_default_register()),
---     },
---   }, require("yanky.config").setup(options)
+require("yanky.config").setup(options)
 
 yanky = {
   setup = function()
@@ -534,245 +413,3 @@ yanky = {
     }
   end,
 }
-local function remove_duplicate_paths(tbl, cwd)
-  local res = {}
-  local hash = {}
-  for _, v in ipairs(tbl) do
-    local v1 = Path:new(v):normalize(cwd)
-    if not hash[v1] then
-      res[#res + 1] = v1
-      hash[v1] = true
-    end
-  end
-  return res
-end
-
-local function join_uniq(tbl, tbl2)
-  local res = {}
-  local hash = {}
-  for _, v1 in ipairs(tbl) do
-    res[#res + 1] = v1
-    hash[v1] = true
-  end
-
-  for _, v in pairs(tbl2) do
-    if not hash[v] then
-      table.insert(res, v)
-    end
-  end
-  return res
-end
-
-local function filter_by_cwd_paths(tbl, cwd)
-  local res = {}
-  local hash = {}
-  for _, v in ipairs(tbl) do
-    if v:find(cwd, 1, true) then
-      local v1 = Path:new(v):normalize(cwd)
-      if not hash[v1] then
-        res[#res + 1] = v1
-        hash[v1] = true
-      end
-    end
-  end
-  return res
-end
-
-local function requiref(module)
-  require(module)
-end
-
-telescope_builtin.my_mru = function(opts)
-  local get_mru = function(opts2)
-    local res = pcall(requiref, "telescope._extensions.frecency")
-    if not res then
-      return vim.tbl_filter(function(val)
-        return 0 ~= vim.fn.filereadable(val)
-      end, vim.v.oldfiles)
-    else
-      local db_client = require "telescope._extensions.frecency.db_client"
-      db_client.init()
-      -- too slow
-      -- local tbl = db_client.get_file_scores(opts, vim.fn.getcwd())
-      local tbl = db_client.get_file_scores(opts2)
-      local get_filename_table = function(tbl2)
-        local res2 = {}
-        for _, v in pairs(tbl2) do
-          res2[#res2 + 1] = v["filename"]
-        end
-        return res2
-      end
-      return get_filename_table(tbl)
-    end
-  end
-  local results_mru = get_mru(opts)
-  local results_mru_cur = filter_by_cwd_paths(results_mru, vim.loop.cwd())
-
-  local show_untracked = vim.F.if_nil(opts.show_untracked, true)
-  local recurse_submodules = vim.F.if_nil(opts.recurse_submodules, false)
-  if show_untracked and recurse_submodules then
-    error "Git does not suppurt both --others and --recurse-submodules"
-  end
-  local cmd = {
-    "git",
-    "ls-files",
-    "--exclude-standard",
-    "--cached",
-    show_untracked and "--others" or nil,
-    recurse_submodules and "--recurse-submodules" or nil,
-  }
-  local results_git = utils.get_os_command_output(cmd)
-
-  local results = join_uniq(results_mru_cur, results_git)
-
-  pickers
-    .new(opts, {
-      prompt_title = "MRU",
-      finder = finders.new_table {
-        results = results,
-        entry_maker = opts.entry_maker or make_entry.gen_from_file(opts),
-      },
-      -- default_text = vim.fn.getcwd(),
-      sorter = conf.file_sorter(opts),
-      previewer = conf.file_previewer(opts),
-    })
-    :find()
-end
-
-telescope_builtin.grep_prompt = function(opts)
-  vim.ui.input({ prompt = "Grep String > " }, function(input)
-    if input == nil then
-      return
-    end
-    opts.search = input
-    telescope_builtin.my_grep(opts)
-  end)
-end
-
-telescope_builtin.my_grep = function(opts)
-  require("telescope.builtin").grep_string {
-    opts = opts,
-    prompt_title = "grep_string: " .. opts.search,
-    search = opts.search,
-    use_regex = true,
-  }
-end
-
-telescope_builtin.my_grep_in_dir = function(opts)
-  vim.ui.input({ prompt = "Grep String > " }, function(input)
-    if input == nil then
-      return
-    end
-    opts.search = input
-    opts.search_dirs = {}
-    vim.ui.input({ prompt = "Target Directory > " }, function(input_dir)
-      if input_dir == nil then
-        return
-      end
-      opts.search_dirs[1] = input_dir
-      require("telescope.builtin").grep_string {
-        opts = opts,
-        prompt_title = "grep_string(dir): " .. opts.search,
-        search = opts.search,
-        search_dirs = opts.search_dirs,
-      }
-    end)
-  end)
-end
-
-telescope_builtin.memo = function(opts)
-  require("telescope.builtin").find_files {
-    opts = opts,
-    prompt_title = "MemoList",
-    find_command = { "find", vim.g.memolist_path, "-type", "f", "-exec", "ls", "-1ta", "{}", "+" },
-  }
-end
-
-vim.api.nvim_set_keymap("n", "<Leader><Leader>", "<Cmd>Telescope my_mru<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap(
-  "n",
-  "[_FuzzyFinder]<Leader>",
-  "<Cmd>Telescope find_files<CR>",
-  { noremap = true, silent = true }
-)
-vim.api.nvim_set_keymap("n", "<Leader>;", "<Cmd>Telescope git_files<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "[_FuzzyFinder];", "<Cmd>Telescope git_files<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap(
-  "n",
-  "<Leader>.",
-  "<Cmd>Telecwoc diagnosticsscope find_files<CR>",
-  { noremap = true, silent = true }
-)
-vim.api.nvim_set_keymap("n", "[_FuzzyFinder].", "<Cmd>Telescope my_mru<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<Leader>,", "<Cmd>Telescope grep_prompt<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "[_FuzzyFinder],", "<Cmd>Telescope grep_prompt<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "[_FuzzyFinder]>", "<Cmd>Telescope my_grep_in_dir<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap(
-  "v",
-  "[_FuzzyFinder],",
-  "y:Telescope my_grep search=<C-r>=escape(@\", '\\.*$^[] ')<CR>",
-  { noremap = true }
-)
-vim.api.nvim_set_keymap(
-  "n",
-  "<Leader>/",
-  ":<C-u>Telescope my_grep search=<C-r>=expand('<cword>')<CR>",
-  { noremap = true }
-)
-vim.api.nvim_set_keymap(
-  "n",
-  "[_FuzzyFinder]/",
-  ":<C-u>Telescope my_grep search=<C-r>=expand('<cword>')<CR>",
-  { noremap = true }
-)
-vim.api.nvim_set_keymap("n", "[_FuzzyFinder]s", "<Cmd>Telescope live_grep<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "[_FuzzyFinder]b", "<Cmd>Telescope buffers<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "[_FuzzyFinder]h", "<Cmd>Telescope help_tags<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "[_FuzzyFinder]c", "<Cmd>Telescope commands<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "[_FuzzyFinder]t", "<Cmd>Telescope treesitter<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "[_FuzzyFinder]q", "<Cmd>Telescope quickfix<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "[_FuzzyFinder]l", "<Cmd>Telescope loclist<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "[_FuzzyFinder]m", "<Cmd>Telescope marks<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "[_FuzzyFinder]r", "<Cmd>Telescope registers<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "[_FuzzyFinder]*", "<Cmd>Telescope grep_string<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap(
-  "n",
-  "[_FuzzyFinder]f",
-  "<Cmd>Telescope file_browser file_browser<CR>",
-  { noremap = true, silent = true }
-)
--- git
-vim.api.nvim_set_keymap(
-  "n",
-  "[_FuzzyFinder]gs",
-  "<Cmd>lua require('telescope.builtin').git_status()<CR>",
-  { noremap = true, silent = true }
-)
-vim.api.nvim_set_keymap(
-  "n",
-  "[_FuzzyFinder]gc",
-  "<Cmd>lua require('telescope.builtin').git_commits()<CR>",
-  { noremap = true, silent = true }
-)
-vim.api.nvim_set_keymap(
-  "n",
-  "[_FuzzyFinder]gC",
-  "<Cmd>lua require('telescope.builtin').git_bcommits()<CR>",
-  { noremap = true, silent = true }
-)
-vim.api.nvim_set_keymap(
-  "n",
-  "[_FuzzyFinder]gb",
-  "<Cmd>lua require('telescope.builtin').git_branches()<CR>",
-  { noremap = true, silent = true }
-)
--- extension
-vim.api.nvim_set_keymap(
-  "n",
-  "[_FuzzyFinder]S",
-  "<Cmd>lua require('telescope').extensions.arecibo.websearch()<CR>",
-  { noremap = true, silent = true }
-)
-
-vim.api.nvim_set_keymap("n", "[_FuzzyFinder]:", "<Cmd>Telescope command_history<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("c", "<C-t>", "<BS><Cmd>Telescope command_history<CR>", { noremap = true, silent = true })

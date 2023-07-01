@@ -1,14 +1,16 @@
 local status, notify = pcall(require, "notify")
-if (not status) then return end
-
+if not status then
+  return
+end
+vim.opt.termguicolors = true
 local client_notifs = {}
 vim.keymap.set("n", "<BS>", function()
-	for _, win in ipairs(vim.api.nvim_list_wins()) do
-		local buf = vim.api.nvim_win_get_buf(win)
-		if vim.fn.bufexists(buf) == 1 and vim.api.nvim_buf_get_option(buf, "filetype") == "notify" then
-			vim.api.nvim_win_close(win, { force = false })
-		end
-	end
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    local buf = vim.api.nvim_win_get_buf(win)
+    if vim.fn.bufexists(buf) == 1 and vim.api.nvim_buf_get_option(buf, "filetype") == "notify" then
+      vim.api.nvim_win_close(win, { force = false })
+    end
+  end
 end, { noremap = true, silent = false })
 
 local function get_notif_data(id, token)
@@ -52,8 +54,8 @@ local function format_message(message, percentage)
 end
 
 local ignored = {
-  ['null-ls'] = true,
-  ['sumneko_lua'] = true
+  ["null-ls"] = true,
+  ["sumneko_lua"] = true,
 }
 
 vim.lsp.handlers["$/progress"] = function(_, result, ctx)
@@ -102,9 +104,13 @@ vim.lsp.handlers["$/progress"] = function(_, result, ctx)
     notif_data.spinner = nil
   end
 end
-notify.setup ({
-	background_colour = "#000000",
-  "This is an error messa1ggge.\nSomething went wrong!", "error", {
+local stages_util = require "notify.stages.util"
+
+notify.setup {
+  background_colour = "#000000",
+  "This is an error messa1ggge.\nSomething went wrong!",
+  "error",
+  {
     title = plugin,
     level = vim.log.levels.INFO,
     fps = 20,
@@ -122,7 +128,7 @@ notify.setup ({
       timer:start(2000, 0, function()
         vim.notify({ "Fixing problem.", "Please wait..." }, "info", {
           title = plugin,
-          timeout = 300,
+          timeout = 30000,
           on_close = function()
             vim.notify("Problem solved", nil, { title = plugin })
             vim.notify("Error code 0x0395AF", 1, { title = plugin })
@@ -130,5 +136,5 @@ notify.setup ({
         })
       end)
     end,
-  }
-})
+  },
+}

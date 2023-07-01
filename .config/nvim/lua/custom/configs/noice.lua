@@ -2,7 +2,6 @@ local status, noice = pcall(require, "noice")
 if not status then
   return
 end
-
 local function myMiniView(pattern, kind)
   kind = kind or ""
   return {
@@ -47,13 +46,16 @@ noice.setup {
   },
   debug = false,
   messages = {
+    enabled = true,
     view = "mini",
-    view_search = "notify",
-    view_error = "notify",
+    view_search = "mini",
+    view_error = "mini",
+    view_history = "mini", -- view for :messages
     view_warn = "mini",
   },
   popupmenu = {
-    backend = "cmp", -- backend to use to show regular cmdline completions
+    enabled = true,
+    backend = "nui", -- backend to use to show regular cmdline completions
     relative = "editor",
     position = {
       row = 8,
@@ -93,7 +95,7 @@ noice.setup {
       ["cmp.entry.get_documentation"] = true,
     },
     signature = {
-      enabled = true,
+      enabled = false,
       auto_open = {
         enabled = true,
         trigger = true, -- Automatically show signature help when typing a trigger character from the LSP
@@ -118,15 +120,10 @@ noice.setup {
         event = "notify",
         warning = true,
         find = "failed to run generator.*is not executable",
+        opts = {
+          skip = true,
+        },
       },
-    },
-    {
-      filter = {
-        event = "notify",
-        warning = true,
-        find = "failed to run generator.*is not executable",
-      },
-      opts = { skip = true },
     },
     myMiniView "Already at .* change",
     myMiniView "written",
@@ -219,8 +216,10 @@ noice.setup {
     cursorline = true,
     cursorlineopt = "line",
     winhighlight = {
-      Normal = "NoicePopupmenu", -- change to NormalFloat to make it look like other floats
-      FloatBorder = "NoicePopupmenuBorder", -- border highlight
+      -- Normal = "NoicePopupmenu", -- change to NormalFloat to make it look like other floats
+      -- FloatBorder = "NoicePopupmenuBorder", -- border highlight
+      Normal = "NormalFloat",
+      FloatBorder = "FloatBorder",
       CursorLine = "NoicePopupmenuSelected", -- used for highlighting the selected item
       PmenuMatch = "NoicePopupmenuMatch", -- used to highlight the part of the item that matches the input
     },

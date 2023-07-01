@@ -7,11 +7,17 @@ local helpers = require "null-ls.helpers"
 local command_resolver = require "null-ls.helpers.command_resolver"
 --local log = require "null-ls.logger"
 local utils = require "null-ls.utils"
-
+local mason_null_ls = require "mason-null-ls"
 local function file_exists(fname)
   local stat = vim.loop.fs_stat(vim.fn.expand(fname))
   return (stat and stat.type) or false
 end
+
+mason_null_ls.setup {
+  ensure_installed = { "prettier" },
+  automatic_installation = true,
+}
+
 local function is_for_node(to_use)
   return function()
     local has_file = utils.make_conditional_utils().root_has_file {

@@ -10,6 +10,10 @@ local fn, uv, api = require("custom.core.utils").globals()
 -- Lsp-config
 -------------------------------------------------------------------------------
 local lsputil = require "lspconfig.util"
+local lsp_signature = require "lsp_signature"
+lsp_signature.setup {
+  hint_enable = false,
+}
 local function toggle_lsp_lines()
   local lines_shown = require("lsp_lines").toggle()
   vim.diagnostic.config { signs = not lines_shown }
@@ -34,7 +38,6 @@ local signature_config = {
     return 0
   end,
 }
-require("lsp_signature").setup(signature_config)
 -- setup calls to specific language servers are located in ftplugins
 function lsputil.on_setup(config)
   config.on_attach = lsputil.add_hook_before(config.on_attach, lsp_mappings)

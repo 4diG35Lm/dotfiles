@@ -105,21 +105,29 @@ goenv rehash --only-manage-paths
 #}}}
 
 # nodenv {{{
-set -gx PATH '$HOME/.anyenv/envs/nodenv/shims' $PATH
-set -gx NODENV_SHELL fish
-command nodenv rehash 2>/dev/null
-function nodenv
-  set command $argv[1]
-  set -e argv[1]
+ set -gx PATH '$HOME/.anyenv/envs/nodenv/shims' $PATH
+ set -gx NODENV_SHELL fish
+ command nodenv rehash 2>/dev/null
+ function nodenv
+   set command $argv[1]
+   set -e argv[1]
 
-  switch "$command"
-  case rehash shell
-    nodenv "sh-$command" $argv|source
-  case '*'
-    command nodenv "$command" $argv
-  end
-end
+   switch "$command"
+   case rehash shell
+     nodenv "sh-$command" $argv|source
+   case '*'
+     command nodenv "$command" $argv
+   end
+ end
+  set -gx NODE_OPTIONS "--openssl-legacy-provider"
 #}}}
+#{{{ rbenv
+#eval (rbenv init - --fish)
+
+#}}}
+#{{{ yarn
+set -U fish_user_paths /usr/bin/yarn $fish_user_paths
+##}}}
 
 # neovim {{{
 set -U EDITOR nvim

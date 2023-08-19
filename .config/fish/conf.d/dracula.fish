@@ -1,3 +1,20 @@
+function _dracula_themes_supported
+    string match -q -r '(?<major>\d+).(?<minor>\d+).(?<patch>\d+)' -- $version
+    test "(( $major -eq 3 -a $minor -ge 4) -o $major -gt 3 )"
+end
+
+function _dracula_self_destruct
+    rm (status --current-filename)
+end
+
+function _dracula_install --on-event dracula_install
+    _dracula_themes_supported && _dracula_self_destruct
+end
+
+function _dracula_update --on-event dracula_update
+    _dracula_themes_supported && _dracula_self_destruct
+end
+
 # Dracula Color Palette
 set -l foreground f8f8f2
 set -l selection 44475a

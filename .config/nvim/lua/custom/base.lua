@@ -64,7 +64,7 @@ local wo = vim.wo
 -- create a completion_nvim table on _G which is visible via
 -- v:lua from vimscript
 _G.completion_nvim = {}
-
+termcodes = vim.api.nvim_replace_termcodes
 function _G.completion_nvim.smart_pumvisible(vis_seq, not_vis_seq)
   if fn.pumvisible() == 1 then
     return termcodes(vis_seq)

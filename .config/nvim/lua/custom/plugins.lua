@@ -124,7 +124,7 @@ local plugins = {
       },
       { "saadparwaiz1/cmp_luasnip" },
       { "tzachar/cmp-tabnine", lazy = false, build = "./install.sh" },
-      --{ "ray-x/cmp-treesitter" },
+      { "ray-x/cmp-treesitter" },
       { "lukas-reineke/cmp-rg" },
       {
         "onsails/lspkind.nvim",

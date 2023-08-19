@@ -1,0 +1,6 @@
+2023/04/27-22:35:40.921 6e49 Creating DB /home/a2c/.config/MongoDB Compass/IndexedDB/file__0.indexeddb.leveldb since it was missing.
+2023/04/27-22:35:40.934 6e49 Reusing MANIFEST /home/a2c/.config/MongoDB Compass/IndexedDB/file__0.indexeddb.leveldb/MANIFEST-000001
+2023/04/29-20:40:49.672 4e12 Level-0 table #5: started
+2023/04/29-20:40:49.675 4e12 Level-0 table #5: 1896 bytes OK
+2023/04/29-20:40:49.682 4e12 Delete type=0 #3
+2023/04/29-20:40:49.682 4e12 Manual compaction at level-0 from (begin) .. (end); will stop at (end)

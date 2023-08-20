@@ -39,5 +39,7 @@ jobs:
               ]
             }
         env:
+          SLACK_USERNAME: DeployBot
+          SLACK_ICON: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_INCOMING_WEBHOOK_URL }}

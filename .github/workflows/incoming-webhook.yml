@@ -21,6 +21,10 @@ jobs:
               "text": ":github: ビルド結果: ${{ job.status }}\n\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}",
               "blocks": [
                 {
+                  "author": "${{ github.event.sender.login }}",
+                  "url": "${{ github.event.pull_request.html_url || github.event.head_commit.url }}",
+                  "repo_name": "${{ github.event.repository.full_name }}",
+                  "status": "${{ job.status }}"
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",

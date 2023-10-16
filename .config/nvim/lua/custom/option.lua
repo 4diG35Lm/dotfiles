@@ -112,11 +112,21 @@ opt.splitright = true
 opt.splitkeep = "cursor"
 opt.equalalways = false
 
+-- カーソルと表示
+-- vim.opt.cursorline = true -- カーソルがある行を強調
+-- vim.opt.cursorcolumn = true -- カーソルがある列を強調
+
+-- クリップボード共有
+vim.opt.clipboard:append { "unnamedplus" } -- レジスタとクリップボードを共有
+
 -- File
 -- vim.o.backup=false   -- バックアップ取らない
+opt.fileencoding = "utf-8" -- エンコーディングをUTF-8に設定
+opt.swapfile = false -- スワップファイルを作成しない
+opt.helplang = "ja" -- ヘルプファイルの言語は日本語
+opt.hidden = true -- バッファを切り替えるときに
+--ファイルを保存しなくてもOKに
 opt.autoread = true -- 他で書き換えられたら自動で読み直す
-opt.swapfile = false -- スワップファイル作らない
-opt.hidden = true -- 編集中でも他のファイルを開けるようにする
 opt.backup = true
 opt.backupdir = vim.fn.stdpath "state" .. "/backup/"
 vim.fn.mkdir(vim.o.backupdir, "p")

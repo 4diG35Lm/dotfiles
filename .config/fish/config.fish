@@ -56,77 +56,56 @@ set __fish_git_prompt_char_stashstate '↩'
 set __fish_git_prompt_char_upstream_ahead '+'
 set __fish_git_prompt_char_upstream_behind '-'
 # }}}
-
+# 改行の設定
+set -g theme_newline_cursor yes
+# プロンプトの設定
+set -g theme_newline_prompt '$ '
+# 時間の表示設定
+set -g theme_display_date no
 # anynenv {{{
 set -x PATH $HOME/.anyenv/bin $PATH
 eval (anyenv init - fish | source)
 set -U FZF_LEGACY_KEYBINDINGS 0
 set -U FZF_REVERSE_ISEARCH_OPTS "--reverse --height=100%"
+if test ! -d $HOME/lib
+  mkdir -p $HOME/lib
+end
 # }}}
 # pyenv {{{
-while set pyenv_index (contains -i -- "$HOME/.anyenv/envs/pyenv/shims" $PATH)
-set -eg PATH[$pyenv_index]; end; set -e pyenv_index
-set -gx PATH '$HOME/.anyenv/envs/pyenv/shims' $PATH
-set -gx PYENV_SHELL fish
-source $HOME/.anyenv/envs/pyenv/libexec/../completions/pyenv.fish
-command pyenv rehash 2>/dev/null
-function pyenv
-  set command $argv[1]
-  set -e argv[1]
-
-  switch "$command"
-  case rehash shell
-    source (pyenv "sh-$command" $argv|psub)
-  case '*'
-    command pyenv "$command" $argv
-  end
+eval (pyenv init - fish | source)
+set -U PYENV_VERSION (pyenv version-name)
+if test ! -L "$HOME/lib/python"
+  ln -s $PYENV_ROOT/versions/$PYENV_VERSION/lib $HOME/lib/python
 end
+
 #}}}
 # goenv {{{
-set -gx GOENV_SHELL fish
-set -gx GOENV_ROOT /home/a2c/.anyenv/envs/goenv
-if not contains $GOENV_ROOT/shims $PATH
-  set -gx PATH $PATH $GOENV_ROOT/shims
+eval (goenv init - fish | source)
+set -U GOENV_VERSION (goenv version-name)
+if test ! -L "$HOME/lib/go"
+  ln -s $GOENV_ROOT/versions/$GOENV_VERSION/lib $HOME/lib/go
 end
-source $HOME/.anyenv/envs/goenv/libexec/../completions/goenv.fish
-command goenv rehash 2>/dev/null
-function goenv
-  set command $argv[1]
-  set -e argv[1]
 
-  switch "$command"
-  case rehash shell
-    source (goenv "sh-$command" $argv|psub)
-  case '*'
-    command goenv "$command" $argv
-  end
-end
-goenv rehash --only-manage-paths
 #}}}
 
 # nodenv {{{
- set -gx PATH '$HOME/.anyenv/envs/nodenv/shims' $PATH
- set -gx NODENV_SHELL fish
- command nodenv rehash 2>/dev/null
- function nodenv
-   set command $argv[1]
-   set -e argv[1]
+eval (nodenv init - fish | source)
+set -U NODENV_VERSION (nodenv version-name)
+if test ! -L "$HOME/lib/node"
+  ln -s $NODENV_ROOT/versions/$NODENV_VERSION/lib $HOME/lib/node
+end
 
-   switch "$command"
-   case rehash shell
-     nodenv "sh-$command" $argv|source
-   case '*'
-     command nodenv "$command" $argv
-   end
- end
-  set -gx NODE_OPTIONS "--openssl-legacy-provider"
 #}}}
 #{{{ rbenv
-#eval (rbenv init - --fish)
+eval (rbenv init - fish| source)
+set -U RBENV_VERSION (rbenv version-name)
+if test ! -L "$HOME/lib/ruby"
+  ln -s $RBENV_ROOT/versions/$RBENV_VERSION/lib $HOME/lib/ruby
+end
 
 #}}}
 #{{{ yarn
-set -U fish_user_paths /usr/bin/yarn $fish_user_paths
+#set -U fish_user_paths /usr/bin/yarn $fish_user_paths
 ##}}}
 
 # neovim {{{
@@ -168,6 +147,9 @@ set -U fish_user_paths $fish_user_paths $HOME/.cargo/bin
 set -U FZF_DISABLE_KEYBINDINGS 1
 source $XDG_CONFIG_HOME/fish/plugins/fzf.fish
 # }}}
+#{{{ tfenv
+set -U fish_user_paths $fish_user_paths $HOME/.tfenv/bin
+#}}}
 
 # PATH {{{
 set -U fish_user_paths (echo $fish_user_paths | tr ' ' '\n' | sort -u)

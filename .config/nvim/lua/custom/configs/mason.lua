@@ -1,3 +1,4 @@
+-- "custom.configs.mason"
 local status, mason = pcall(require, "mason")
 if not status then
   return
@@ -11,6 +12,8 @@ local status_ok_2, lsp_status = pcall(require, "lsp-status")
 if not status_ok_2 then
   return
 end
+local mason_package = require "mason-core.package"
+local mason_registry = require "mason-registry"
 local lspconfig = require "lspconfig"
 
 local servers = {
@@ -62,6 +65,10 @@ local servers = {
   --     lspconfig.util.find_git_ancestor(fname) or vim.loop.os_homedir()
   --   end
   -- },
+  black = {},
+  debugpy = {},
+  mypy = {},
+  ruff = {},
   pyright = {
     handlers = {
       ["client/registerCapability"] = function(_, _, z, j)
@@ -140,7 +147,6 @@ local servers = {
             if err then
               error(tostring(err))
             end
-            print("Forward search " .. vim.inspect(pos) .. " " .. texlab_search_status[result])
           end)
         end,
         description = "Run synctex forward search",
@@ -148,9 +154,12 @@ local servers = {
     },
   },
   tsserver = {},
+  eslint = {},
+  prettier = {},
   vimls = {},
   hls = {},
   solargraph = {},
+  tailwindcss = {},
 }
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
@@ -158,6 +167,12 @@ capabilities = require("cmp_nvim_lsp").update_capabilities(capabilities)
 
 -- Here we declare which settings to pass to the mason, and also ensure servers are installed. If not, they will be installed automatically.
 local settings = {
+  ensure_installed = {
+    "debugpy",
+    "black",
+    "ruff",
+    "mypy",
+  },
   ui = {
     check_outdated_packages_on_open = false,
     border = "rounded",
@@ -198,4 +213,3 @@ mason_lspconfig.setup {
   ensure_installed = servers,
   automatic_installation = true,
 }
-local mason_package = require "mason-core.package"

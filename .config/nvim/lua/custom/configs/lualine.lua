@@ -1,5 +1,19 @@
 local status, lualine = pcall(require, "lualine")
 if (not status) then return end
+
+local lazy_status = require("lazy.status") -- to configure lazy pending updates count
+
+local colors = {
+  blue = "#65D1FF",
+  green = "#3EFFDC",
+  violet = "#FF61EF",
+  yellow = "#FFDA7B",
+  red = "#FF4A4A",
+  fg = "#c3ccdc",
+  bg = "#112638",
+  inactive_bg = "#2c3043",
+}
+
 lualine.setup {
   options = {
     icons_enabled = true,
@@ -23,7 +37,16 @@ lualine.setup {
     lualine_a = {'mode'},
     lualine_b = {'branch', 'diff', 'diagnostics'},
     lualine_c = {'filename'},
-    lualine_x = {'encoding', 'fileformat', 'filetype'},
+    lualine_x = {
+      {
+        lazy_status.updates,
+        cond = lazy_status.has_updates,
+        color = { fg = "#ff9e64" },
+      },
+      { "encoding" },
+      { "fileformat" },
+      { "filetype" },
+    },
     lualine_y = {'progress'},
     lualine_z = {'location'}
   },

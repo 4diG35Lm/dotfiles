@@ -1,5 +1,4 @@
-local overrides = require "custom.configs.overrides"
-
+-- custom.plugins
 ---@type NvPluginSpec[]
 local plugins = {
   -- Override plugin definition options
@@ -11,12 +10,6 @@ local plugins = {
     event = { "BufReadPre", "BufRead" },
     dependencies = {
       {
-        "jose-elias-alvarez/null-ls.nvim",
-        config = function()
-          require "custom.configs.null-ls"
-        end,
-      },
-      {
         "folke/neoconf.nvim",
         config = function()
           require "custom.configs.neoconf"
@@ -27,10 +20,6 @@ local plugins = {
         dependencies = {
           {
             "neovim/nvim-lspconfig",
-            lazy = false,
-            config = function()
-              require "custom.configs.nvim-lspconfig"
-            end,
           },
           {
             "WhoIsSethDaniel/mason-tool-installer.nvim",
@@ -79,12 +68,8 @@ local plugins = {
             require "custom.configs.mason-lspconfig"
           end,
         },
-        {
-          "jay-babu/mason-null-ls.nvim",
-        },
       },
       config = function()
-        require "plugins.configs.lspconfig"
         require "custom.lsp.config"
       end, -- Override to setup mason-lspconfig
     },
@@ -92,7 +77,6 @@ local plugins = {
   -- override plugin configs
   {
     "williamboman/mason.nvim",
-    opts = overrides.mason,
     config = function()
       require "custom.configs.mason"
     end, -- Override to setup mason-lspconfig
@@ -103,10 +87,12 @@ local plugins = {
   ----   -- Auto Completion
   {
     "hrsh7th/nvim-cmp",
-    event = "VimEnter",
+    event = "InsertEnter",
     dependencies = {
       { "cmp-under-comparator" },
       { "L3MON4D3/LuaSnip" },
+      { "saadparwaiz1/cmp_luasnip" },
+      { "rafamadriz/friendly-snippets" },
       { "windwp/nvim-autopairs" },
       { "hrsh7th/cmp-buffer" },
       { "hrsh7th/cmp-path" },
@@ -116,12 +102,7 @@ local plugins = {
       { "hrsh7th/cmp-calc" },
       { "f3fora/cmp-spell" },
       { "yutkat/cmp-mocword" },
-      {
-        "uga-rosa/cmp-dictionary",
-        config = function()
-          require "custom.configs.cmp-dictionary"
-        end,
-      },
+      { "uga-rosa/cmp-dictionary" },
       { "saadparwaiz1/cmp_luasnip" },
       { "tzachar/cmp-tabnine", lazy = false, build = "./install.sh" },
       { "ray-x/cmp-treesitter" },
@@ -169,8 +150,21 @@ local plugins = {
       { "folke/neoconf.nvim" },
       { "quangnguyen30192/cmp-nvim-ultisnips" },
     },
+    config = function()
+      require "custom.cmp.config"
+    end,
   },
-
+  {
+    "nvimtools/none-ls.nvim", -- configure formatters & linters
+    lazy = true,
+    -- event = { "BufReadPre", "BufNewFile" }, -- to enable uncomment this
+    dependencies = {
+      { "jay-babu/mason-null-ls.nvim" },
+    },
+    config = function()
+      require "custom.configs.none-ls"
+    end,
+  },
   --------------------------------
   --  Treesitter
   {
@@ -185,7 +179,7 @@ local plugins = {
       { "tree-sitter/tree-sitter-javascript" },
     },
     config = function()
-      require "custom.configs.nvim-treesitter"
+      require "custom.Treesitter.config"
     end,
   },
   {
@@ -201,6 +195,13 @@ local plugins = {
   ----  Treesitter  UI  customize
   { "haringsrob/nvim_context_vt", event = "VimEnter" },
   { "David-Kunz/treesitter-unit", event = "VimEnter" },
+  {
+    "nvim-treesitter/nvim-treesitter-textobjects",
+    lazy = true,
+    config = function()
+      require "custom.configs.nvim-treesitter-textobjects"
+    end,
+  },
   --------------------------------
   ---- telescope.nvim
   {
@@ -392,13 +393,13 @@ local plugins = {
   -- To make a plugin not be loaded
   {
     "NvChad/nvim-colorizer.lua",
+    config = function()
+      require "custom.configs.nvim-colorizer"
+    end,
     --enabled = false,
   },
 
   { "nvim-lua/plenary.nvim" },
-  -- bootstrap
-  { "vim-jp/vimdoc-ja" },
-  ------------------------------------------------------------
   ---- Library
   --------------------------------
   ---- Vim script Library
@@ -410,21 +411,21 @@ local plugins = {
   {
     "rcarriga/nvim-notify",
     config = function()
-      require "custom.configs.nvim-notify"
-    end, -- Override to setup mason-lspconfig
+      require "custom.configs.notify"
+    end,
   },
   {
     "MunifTanjim/nui.nvim",
     config = function()
       require "custom.configs.nui"
-    end, -- Override to setup mason-lspconfig
+    end,
   },
   --------------------------------
   ---- UI Library
   {
     "stevearc/dressing.nvim",
     lazy = false,
-    event = { "VimEnter" },
+    event = { "VeryLazy" },
     config = function()
       require "custom.configs.dressing"
     end, -- Override to setup mason-lspconfig
@@ -474,21 +475,34 @@ local plugins = {
   -- Post-install/update hook with call of vimscript function with argument
   {
     "glacambre/firenvim",
-    lazy = false,
     build = function()
       vim.fn["firenvim#install"](0)
     end,
     lazy = false,
   },
   --  Editor Config
+  { "MunifTanjim/eslint.nvim" },
   {
-    "jose-elias-alvarez/null-ls.nvim",
+    "stevearc/conform.nvim",
+    event = { "BufReadPre", "BufNewFile" }, -- to disable, comment this out
+    config = function()
+      require "custom.configs.conform"
+    end,
+  },
+  { "acro5piano/nvim-format-buffer" },
+  {
+    "mfussenegger/nvim-lint",
+    event = "VeryLazy",
+    config = function()
+      require "custom.configs.nvim-lint"
+    end,
   },
   {
-    "MunifTanjim/eslint.nvim",
-    dependencies = {
-      { "jose-elias-alvarez/null-ls.nvim" },
-    },
+    "JohnnyMorganz/StyLua",
+    event = "VeryLazy",
+    config = function()
+      require "custom.configs.stylua"
+    end, -- Override to setup mason-lspconfig
   },
   --------------------------------------------------------------
   ---- FuzzyFinders
@@ -638,6 +652,12 @@ local plugins = {
     event = "VimEnter",
     config = function()
       require "custom.configs.hop"
+    end,
+  },
+  {
+    "ThePrimeagen/harpoon",
+    config = function()
+      require "custom.configs.harpoon"
     end,
   },
   ----------------
@@ -1039,7 +1059,13 @@ local plugins = {
   },
   --------------------------------
   ----  Task  runner
-  { "stevearc/overseer.nvim", event = "VimEnter" },
+  {
+    "stevearc/overseer.nvim",
+    event = "VimEnter",
+    config = function()
+      require "custom.configs.overseer"
+    end,
+  },
   {
     "yutkat/taskrun.nvim",
     lazy = false,
@@ -1115,6 +1141,9 @@ local plugins = {
   {
     "rcarriga/nvim-dap-ui",
     lazy = false,
+    dependencies = {
+      { "mfussenegger/nvim-dap" },
+    },
     config = function()
       require "custom.configs.nvim-dap-ui"
     end,
@@ -1127,6 +1156,17 @@ local plugins = {
     end,
   },
   {
+    "mfussenegger/nvim-dap-python",
+    ft = "python",
+    dependencies = {
+      { "mfussenegger/nvim-dap" },
+      { "rcarriga/nvim-dap-ui" },
+    },
+    config = function()
+      require "custom.configs.nvim-dap-python"
+    end,
+  },
+  {
     "mfussenegger/nvim-dap",
     lazy = false,
     event = "VimEnter",
@@ -1134,6 +1174,7 @@ local plugins = {
       { "rcarriga/nvim-dap-ui" },
       { "theHamsta/nvim-dap-virtual-text" },
       { "nvim-telescope/telescope-dap.nvim" },
+      { "mxsdev/nvim-dap-vscode-js", build = "npm install --legacy-peer-deps && npm run compile" },
     },
     config = function()
       require "custom.configs.nvim-dap"
@@ -1269,7 +1310,14 @@ local plugins = {
     "kdheepak/tabline.nvim",
     lazy = false,
     dependencies = {
-      { "nvim-lualine/lualine.nvim", lazy = true },
+      {
+        "nvim-lualine/lualine.nvim",
+        lazy = true,
+        dependencies = { "nvim-tree/nvim-web-devicons" },
+        config = function()
+          require "custom.configs.lualine"
+        end,
+      },
       { "nvim-tree/nvim-web-devicons", lazy = true },
     },
     config = function()
@@ -1318,6 +1366,20 @@ local plugins = {
   { "ocaml/vim-ocaml" },
   { "wlangstroth/vim-racket" },
   { "justinmk/vim-syntax-extra" },
+  {
+    "microsoft/vscode-js-debug",
+    lazy = false,
+  },
+  {
+    "romgrk/barbar.nvim",
+    dependencies = {
+      { "lewis6991/gitsigns.nvim" }, -- OPTIONAL: for git status
+      { "nvim-tree/nvim-web-devicons" }, -- OPTIONAL: for file icons
+    },
+    config = function()
+      require "custom.configs.barbar"
+    end,
+  },
   --  -- copilot
   --  {
   --    "github/copilot.vim",

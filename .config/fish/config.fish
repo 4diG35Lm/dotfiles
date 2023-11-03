@@ -56,6 +56,9 @@ set __fish_git_prompt_char_stashstate '↩'
 set __fish_git_prompt_char_upstream_ahead '+'
 set __fish_git_prompt_char_upstream_behind '-'
 # }}}
+# {{{ Editor
+set -gx EDITOR nvim
+# }}}
 # 改行の設定
 set -g theme_newline_cursor yes
 # プロンプトの設定

@@ -1,3 +1,4 @@
+-- custom.base
 vim.cmd "autocmd!"
 
 vim.scriptencoding = "utf-8"
@@ -36,6 +37,8 @@ vim.cmd [[
   filetype off
   filetype plugin indent off
 ]]
+-- Lazy redraw
+vim.o.lazyredraw = true
 
 -- local utils = require("utils")
 -- Neovim-specific configuration
@@ -145,7 +148,7 @@ endif
 
 local vars = {
   python_host_prog = "/usr/bin/python2",
-  python3_host_prog = "$HOME/.anyenv/envs/pyenv/versions/3.11.0/bin/python",
+  python3_host_prog = "$HOME/.anyenv/envs/pyenv/versions/3.11.4/bin/python",
   loaded_matchparen = 1,
 }
 

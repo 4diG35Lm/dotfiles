@@ -13,7 +13,7 @@ local api_tbl = setmetatable({ _cache = {} }, {
 })
 
 local function globals()
-  return vim.fn, vim.loop, api_tbl
+  return vim.fn, vim.uv, api_tbl
 end
 
 return {

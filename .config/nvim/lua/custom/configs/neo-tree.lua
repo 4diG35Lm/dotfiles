@@ -12,7 +12,6 @@ neo_tree.setup {
   add_blank_line_at_top = true, --ツリーの最上部に空白行を追加します。
   auto_clean_after_session_restore = false, --セッションに保存された壊れたネオツリー バッファを自動的にクリーンアップします
   close_if_last_window = true, --それがタブに残された最後のウィンドウである場合、Neo-tree を閉じます
-  close_if_last_window = true, -- Close Neo-tree if it is the last window left in the tab
   popup_border_style = "rounded",
   enable_git_status = true,
   enable_diagnostics = true,

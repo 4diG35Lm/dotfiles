@@ -1,5 +1,10 @@
-vim.notify = require("notify")
-require("overseer").setup({
+-- custom.configs.overseer
+local status, overseer = pcall(require, "overseer")
+if not status then
+	return
+end
+
+overseer.setup({
 	task_list = {
 		bindings = {
 			["<Tab>"] = "IncreaseDetail",
@@ -16,7 +21,6 @@ vim.api.nvim_create_user_command("T", function(param)
 	if previous_win and vim.api.nvim_win_is_valid(previous_win) then
 		vim.api.nvim_win_close(previous_win, true)
 	end
-	-- vim.cmd("OverseerOpen!")
 	vim.cmd("OverseerRunCmd " .. param.args)
 	vim.cmd("OverseerQuickAction open hsplit")
 	vim.cmd("resize 30")
@@ -33,10 +37,6 @@ end, { nargs = "?", force = true })
 vim.keymap.set("n", "[_Make]m", "<Cmd>OverseerToggle<CR>", { noremap = true, silent = true })
 vim.keymap.set("n", "[_Make]q", "<Cmd>OverseerToggle<CR>", { noremap = true, silent = true })
 vim.keymap.set("n", "[_Make]r", function()
-	if previous_cmd == "" then
-		vim.notify("Please start T with arguments")
-		return
-	end
 	vim.cmd("T " .. previous_cmd)
 end, { noremap = true, silent = true })
 

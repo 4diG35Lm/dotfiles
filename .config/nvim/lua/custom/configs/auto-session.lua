@@ -1,11 +1,14 @@
-local status,  auto_sesssion = pcall(require,  "auto-sesssion")
-if (not status) then return end
+-- custon.configns.auto-session
+local status, auto_session = pcall(require, "auto-sesssion")
+if not status then
+	return
+end
 
 auto_session.setup({
 	log_level = "error",
 	auto_session_enable_last_session = false,
 	auto_session_root_dir = vim.fn.stdpath("state") .. "/sessions/",
-	auto_session_suppress_dirs = { "~/", "~/Projects", "~/Downloads", "/"},
+	auto_session_suppress_dirs = { "~/", "~/Projects", "~/Downloads", "/" },
 	auto_session_enabled = true,
 	auto_save_enabled = false,
 	auto_restore_enabled = false,

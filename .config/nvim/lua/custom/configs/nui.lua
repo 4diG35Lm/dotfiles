@@ -1,118 +1,116 @@
+-- custom.configs.nui
 local status, nui = pcall(require, "nui")
 if not status then
-  return
+	return
 end
 
-local Popup = require "nui.popup"
-local Layout = require "nui.layout"
-local Input = require "nui.input"
-local Split = require "nui.split"
-local NuiTree = require "nui.tree"
-local NuiLine = require "nui.line"
+local Popup = require("nui.popup")
+local Layout = require("nui.layout")
+local Input = require("nui.input")
+local Split = require("nui.split")
+local NuiTree = require("nui.tree")
+local NuiLine = require("nui.line")
 local event = require("nui.utils.autocmd").event
-Popup {
-  enter = true,
-  focusable = true,
-  border = {
-    style = "rounded",
-    text = {
-      top = "[Rename]",
-      top_align = "left",
-    },
-  },
-  position = "50%",
-  size = {
-    width = "80%",
-    height = "60%",
-  },
-  highlight = "Normal:Normal",
-  -- place the popup window relative to the
-  -- buffer position of the identifier
-  relative = {
-    type = "buf",
-    position = {
-      -- this is the same `params` we got earlier
-      row = params.position.line,
-      col = params.position.character,
-    },
-  },
-}
+local Timer = Popup:extend("Timer")
+
+Popup({
+	enter = true,
+	focusable = true,
+	border = {
+		style = "rounded",
+		text = {
+			top = "[Rename]",
+			top_align = "left",
+		},
+	},
+	position = "50%",
+	size = {
+		width = "80%",
+		height = "60%",
+	},
+	highlight = "Normal:Normal",
+	-- place the popup window relative to the
+	-- buffer position of the identifier
+	relative = {
+		type = "buf",
+	},
+})
 -- mount/open the component
-popup:mount()
+Popup:mount()
 
 -- unmount component when cursor leaves buffer
-popup:on(event.BufLeave, function()
-  popup:unmount()
+Popup:on(event.BufLeave, function()
+	Popup:unmount()
 end)
 
 -- set content
-vim.api.nvim_buf_set_lines(popup.bufnr, 0, 1, false, { "Hello World" })
+vim.api.nvim_buf_set_lines(Popup.bufnr, 0, 1, false, { "Hello World" })
 
-local popup_one, popup_two = Popup {
-  enter = true,
-  border = "single",
-}, Popup {
-  border = "double",
-}
+local popup_one, popup_two = Popup({
+	enter = true,
+	border = "single",
+}), Popup({
+	border = "double",
+})
 
 local layout = Layout(
-  {
-    position = "50%",
-    size = {
-      width = 80,
-      height = "60%",
-    },
-  },
-  Layout.Box({
-    Layout.Box(popup_one, { size = "40%" }),
-    Layout.Box(popup_two, { size = "60%" }),
-  }, { dir = "row" })
+	{
+		position = "50%",
+		size = {
+			width = 80,
+			height = "60%",
+		},
+	},
+	Layout.Box({
+		Layout.Box(popup_one, { size = "40%" }),
+		Layout.Box(popup_two, { size = "60%" }),
+	}, { dir = "row" })
 )
 
 local current_dir = "row"
 
 popup_one:map("n", "r", function()
-  if current_dir == "col" then
-    layout:update(Layout.Box({
-      Layout.Box(popup_one, { size = "40%" }),
-      Layout.Box(popup_two, { size = "60%" }),
-    }, { dir = "row" }))
+	if current_dir == "col" then
+		layout:update(Layout.Box({
+			Layout.Box(popup_one, { size = "40%" }),
+			Layout.Box(popup_two, { size = "60%" }),
+		}, { dir = "row" }))
 
-    current_dir = "row"
-  else
-    layout:update(Layout.Box({
-      Layout.Box(popup_two, { size = "60%" }),
-      Layout.Box(popup_one, { size = "40%" }),
-    }, { dir = "col" }))
+		current_dir = "row"
+	else
+		layout:update(Layout.Box({
+			Layout.Box(popup_two, { size = "60%" }),
+			Layout.Box(popup_one, { size = "40%" }),
+		}, { dir = "col" }))
 
-    current_dir = "col"
-  end
+		current_dir = "col"
+	end
 end, {})
 
 local input = Input({
-  position = "50%",
-  size = {
-    width = 20,
-  },
-  border = {
-    style = "single",
-    text = {
-      top = "[Howdy?]",
-      top_align = "center",
-    },
-  },
-  win_options = {
-    winhighlight = "Normal:Normal,FloatBorder:Normal",
-  },
+	position = "50%",
+	size = {
+		width = 20,
+	},
+	border = {
+		style = "single",
+		text = {
+			top = "[Howdy?]",
+			top_align = "center",
+		},
+	},
+	win_options = {
+		winhighlight = "Normal:Normal,FloatBorder:Normal",
+	},
 }, {
-  prompt = "> ",
-  default_value = "Hello",
-  on_close = function()
-    print "Input Closed!"
-  end,
-  on_submit = function(value)
-    print("Input Submitted: " .. value)
-  end,
+	prompt = "> ",
+	default_value = "Hello",
+	on_close = function()
+		print("Input Closed!")
+	end,
+	on_submit = function(value)
+		print("Input Submitted: " .. value)
+	end,
 })
 
 -- mount/open the component
@@ -120,125 +118,174 @@ input:mount()
 
 -- unmount component when cursor leaves buffer
 input:on(event.BufLeave, function()
-  input:unmount()
+	input:unmount()
 end)
 
-local split = Split {
-  relative = "editor",
-  position = "bottom",
-  size = "20%",
-}
+local split = Split({
+	relative = "editor",
+	position = "bottom",
+	size = "20%",
+})
 
 -- mount/open the component
 split:mount()
 
 -- unmount component when cursor leaves buffer
 split:on(event.BufLeave, function()
-  split:unmount()
+	split:unmount()
 end)
 
-local tree = NuiTree {
-  winid = split.winid,
-  nodes = {
-    NuiTree.Node { text = "a" },
-    NuiTree.Node({ text = "b" }, {
-      NuiTree.Node { text = "b-1" },
-      NuiTree.Node({ text = "b-2" }, {
-        NuiTree.Node { text = "b-1-a" },
-        NuiTree.Node { text = "b-2-b" },
-      }),
-    }),
-    NuiTree.Node({ text = "c" }, {
-      NuiTree.Node { text = "c-1" },
-      NuiTree.Node { text = "c-2" },
-    }),
-  },
-  prepare_node = function(node)
-    local line = NuiLine()
+local tree = NuiTree({
+	winid = split.winid,
+	nodes = {
+		NuiTree.Node({ text = "a" }),
+		NuiTree.Node({ text = "b" }, {
+			NuiTree.Node({ text = "b-1" }),
+			NuiTree.Node({ text = "b-2" }, {
+				NuiTree.Node({ text = "b-1-a" }),
+				NuiTree.Node({ text = "b-2-b" }),
+			}),
+		}),
+		NuiTree.Node({ text = "c" }, {
+			NuiTree.Node({ text = "c-1" }),
+			NuiTree.Node({ text = "c-2" }),
+		}),
+	},
+	prepare_node = function(node)
+		local line = NuiLine()
 
-    line:append(string.rep("  ", node:get_depth() - 1))
+		line:append(string.rep("  ", node:get_depth() - 1))
 
-    if node:has_children() then
-      line:append(node:is_expanded() and " " or " ", "SpecialChar")
-    else
-      line:append "  "
-    end
+		if node:has_children() then
+			line:append(node:is_expanded() and " " or " ", "SpecialChar")
+		else
+			line:append("  ")
+		end
 
-    line:append(node.text)
+		line:append(node.text)
 
-    return line
-  end,
-}
+		return line
+	end,
+})
 
 local map_options = { noremap = true, nowait = true }
 
 -- print current node
 split:map("n", "<CR>", function()
-  local node = tree:get_node()
-  print(vim.inspect(node))
+	local node = tree:get_node()
+	print(vim.inspect(node))
 end, map_options)
 
 -- collapse current node
 split:map("n", "h", function()
-  local node = tree:get_node()
+	local node = tree:get_node()
 
-  if node:collapse() then
-    tree:render()
-  end
+	if node:collapse() then
+		tree:render()
+	end
 end, map_options)
 
 -- collapse all nodes
 split:map("n", "H", function()
-  local updated = false
+	local updated = false
 
-  for _, node in pairs(tree.nodes.by_id) do
-    updated = node:collapse() or updated
-  end
+	for _, node in pairs(tree.nodes.by_id) do
+		updated = node:collapse() or updated
+	end
 
-  if updated then
-    tree:render()
-  end
+	if updated then
+		tree:render()
+	end
 end, map_options)
 
 -- expand current node
 split:map("n", "l", function()
-  local node = tree:get_node()
+	local node = tree:get_node()
 
-  if node:expand() then
-    tree:render()
-  end
+	if node:expand() then
+		tree:render()
+	end
 end, map_options)
 
 -- expand all nodes
 split:map("n", "L", function()
-  local updated = false
+	local updated = false
 
-  for _, node in pairs(tree.nodes.by_id) do
-    updated = node:expand() or updated
-  end
+	for _, node in pairs(tree.nodes.by_id) do
+		updated = node:expand() or updated
+	end
 
-  if updated then
-    tree:render()
-  end
+	if updated then
+		tree:render()
+	end
 end, map_options)
 
 -- add new node under current node
 split:map("n", "a", function()
-  local node = tree:get_node()
-  tree:add_node(
-    NuiTree.Node({ text = "d" }, {
-      NuiTree.Node { text = "d-1" },
-    }),
-    node:get_id()
-  )
-  tree:render()
+	local node = tree:get_node()
+	tree:add_node(
+		NuiTree.Node({ text = "d" }, {
+			NuiTree.Node({ text = "d-1" }),
+		}),
+		node:get_id()
+	)
+	tree:render()
 end, map_options)
 
 -- delete current node
 split:map("n", "d", function()
-  local node = tree:get_node()
-  tree:remove_node(node:get_id())
-  tree:render()
+	local node = tree:get_node()
+	tree:remove_node(node:get_id())
+	tree:render()
 end, map_options)
 
 tree:render()
+function Timer:init(popup_options)
+	local options = vim.tbl_deep_extend("force", popup_options or {}, {
+		border = "double",
+		focusable = false,
+		position = { row = 0, col = "100%" },
+		size = { width = 10, height = 1 },
+		win_options = {
+			winhighlight = "Normal:Normal,FloatBorder:SpecialChar",
+		},
+	})
+
+	Timer.super.init(self, options)
+end
+
+function Timer:countdown(time, step, format)
+	local function draw_content(text)
+		local gap_width = 10 - vim.api.nvim_strwidth(text)
+		vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, {
+			string.format(
+				"%s%s%s",
+				string.rep(" ", math.floor(gap_width / 2)),
+				text,
+				string.rep(" ", math.ceil(gap_width / 2))
+			),
+		})
+	end
+
+	self:mount()
+
+	local remaining_time = time
+
+	draw_content(format(remaining_time))
+
+	vim.fn.timer_start(step, function()
+		remaining_time = remaining_time - step
+
+		draw_content(format(remaining_time))
+
+		if remaining_time <= 0 then
+			self:unmount()
+		end
+	end, { ["repeat"] = math.ceil(remaining_time / step) })
+end
+
+local timer = Timer()
+
+timer:countdown(10000, 1000, function(time)
+	return tostring(time / 1000) .. "s"
+end)

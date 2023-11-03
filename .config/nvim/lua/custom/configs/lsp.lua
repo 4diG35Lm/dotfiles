@@ -1,5 +1,7 @@
 local status, nvim_lsp = pcall(require, "lspconfig")
-if (not status) then return end
+if not status then
+  return
+end
 
 local fn, uv, api = require("core.utils").globals()
 local fn = vim.fn
@@ -10,14 +12,14 @@ local palette = require "core.utils.palette" "nord"
 -- local utils = require('nvim-lsputils')
 local system_name
 
-if vim.fn.has("mac") == 1 then
+if vim.fn.has "mac" == 1 then
   system_name = "macOS"
-elseif vim.fn.has("unix") == 1 then
+elseif vim.fn.has "unix" == 1 then
   system_name = "Linux"
-elseif vim.fn.has('win32') == 1 then
+elseif vim.fn.has "win32" == 1 then
   system_name = "Windows"
 else
-  print("Unsupported system for sumneko")
+  print "Unsupported system for sumneko"
 end
 
 api.create_autocmd("ColorScheme", {
@@ -41,8 +43,8 @@ api.create_autocmd("ColorScheme", {
 
 local signs = { error = "", warn = "", Hint = "", Info = "" }
 for type, icon in pairs(signs) do
-	local hl = "DiagnosticSign" .. type
-	fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
+  local hl = "DiagnosticSign" .. type
+  fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
 end
 fn.sign_define("DiagnosticSignError", { texthl = "DiagnosticSignError", text = "●" })
 fn.sign_define("DiagnosticSignWarn", { texthl = "DiagnosticSignWarn", text = "○" })
@@ -52,50 +54,50 @@ fn.sign_define("DiagnosticSignHint", { texthl = "DiagnosticSignHint", text = "�
 api.create_autocmd("LspAttach", {
   group = api.create_augroup("enable-lualine-lsp", {}),
   once = true,
-  desc = 'LSP actions',
+  desc = "LSP actions",
   callback = function()
     require("modules.start.config.lualine").is_lsp_available = true
     local bufmap = function(mode, lhs, rhs)
-      local opts = {buffer = true}
+      local opts = { buffer = true }
       vim.keymap.set(mode, lhs, rhs, opts)
     end
 
     -- Displays hover information about the symbol under the cursor
-    bufmap('n', 'K', '<cmd>lua vim.lsp.buf.hover()<cr>')
+    bufmap("n", "K", "<cmd>lua vim.lsp.buf.hover()<cr>")
 
     -- Jump to the definition
-    bufmap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>')
+    bufmap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<cr>")
 
     -- Jump to declaration
-    bufmap('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<cr>')
+    bufmap("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<cr>")
 
     -- Lists all the implementations for the symbol under the cursor
-    bufmap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<cr>')
+    bufmap("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<cr>")
 
     -- Jumps to the definition of the type symbol
-    bufmap('n', 'go', '<cmd>lua vim.lsp.buf.type_definition()<cr>')
+    bufmap("n", "go", "<cmd>lua vim.lsp.buf.type_definition()<cr>")
 
     -- Lists all the references
-    bufmap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<cr>')
+    bufmap("n", "gr", "<cmd>lua vim.lsp.buf.references()<cr>")
 
     -- Displays a function's signature information
-    bufmap('n', 'gs', '<cmd>lua vim.lsp.buf.signature_help()<cr>')
+    bufmap("n", "gs", "<cmd>lua vim.lsp.buf.signature_help()<cr>")
 
     -- Renames all references to the symbol under the cursor
-    bufmap('n', '<F2>', '<cmd>lua vim.lsp.buf.rename()<cr>')
+    bufmap("n", "<F2>", "<cmd>lua vim.lsp.buf.rename()<cr>")
 
     -- Selects a code action available at the current cursor position
-    bufmap('n', '<F4>', '<cmd>lua vim.lsp.buf.code_action()<cr>')
-    bufmap('x', '<F4>', '<cmd>lua vim.lsp.buf.range_code_action()<cr>')
+    bufmap("n", "<F4>", "<cmd>lua vim.lsp.buf.code_action()<cr>")
+    bufmap("x", "<F4>", "<cmd>lua vim.lsp.buf.range_code_action()<cr>")
 
     -- Show diagnostics in a floating window
-    bufmap('n', 'gl', '<cmd>lua vim.diagnostic.open_float()<cr>')
+    bufmap("n", "gl", "<cmd>lua vim.diagnostic.open_float()<cr>")
 
     -- Move to the previous diagnostic
-    bufmap('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<cr>')
+    bufmap("n", "[d", "<cmd>lua vim.diagnostic.goto_prev()<cr>")
 
     -- Move to the next diagnostic
-    bufmap('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<cr>')
+    bufmap("n", "]d", "<cmd>lua vim.diagnostic.goto_next()<cr>")
   end,
 })
 
@@ -110,52 +112,51 @@ local home_dir = function(p)
   return uv.os_homedir() .. (p or "")
 end
 
-local protocol = require('vim.lsp.protocol')
-local lspconfig = require("lspconfig")
+local protocol = require "vim.lsp.protocol"
+local lspconfig = require "lspconfig"
 local lsp_defaults = lspconfig.util.default_config
-lsp_defaults.capabilities = vim.tbl_deep_extend(
-  'force',
-  lsp_defaults.capabilities,
-  require('cmp_nvim_lsp').default_capabilities()
-)
+lsp_defaults.capabilities =
+  vim.tbl_deep_extend("force", lsp_defaults.capabilities, require("cmp_nvim_lsp").default_capabilities())
 
-local nlspsettings = require("nlspsettings")
+local nlspsettings = require "nlspsettings"
 local palette = require "core.utils.palette" "nord"
 
-local completion = require('completion')
-local lsp_status = require('lsp-status')
+local completion = require "completion"
+local lsp_status = require "lsp-status"
 lsp_status.register_progress()
-local pyright = require('lspconfig').pyright
+local pyright = require("lspconfig").pyright
 
 local texlab_search_status = vim.tbl_add_reverse_lookup {
   Success = 0,
   Error = 1,
   Failure = 2,
-  Unconfigured = 3
+  Unconfigured = 3,
 }
 
 -- Lsp-config
 -------------------------------------------------------------------------------
-local lsputil = require('lspconfig.util')
+local lsputil = require "lspconfig.util"
 
 local function map(mode, lhs, rhs, opts)
-  local options = { noremap=true, silent=true }
+  local options = { noremap = true, silent = true }
   if opts then
-    options = vim.tbl_extend('force', options, opts)
+    options = vim.tbl_extend("force", options, opts)
   end
   vim.api.nvim_set_keymap(mode, lhs, rhs, options)
 end
 
 local function lsp_mappings(_, buf)
-  local bufopts = {buffer = buf, unpack(opts)}
-  map("n", "gd",         lsp.buf.definition, bufopts)
-  map("n", "gD",         lsp.buf.declaration, bufopts)
+  local bufopts = { buffer = ev.buf }
+  map("n", "gd", lsp.buf.definition, bufopts)
+  map("n", "gD", lsp.buf.declaration, bufopts)
   map("n", "<leader>gi", lsp.buf.implementation, bufopts)
   map("n", "<leader>gt", lsp.buf.type_definition, bufopts)
-  map("n", "<C-k>",      lsp.buf.signature_help, bufopts)
+  map("n", "<C-k>", lsp.buf.signature_help, bufopts)
   map("n", "<leader>wa", lsp.buf.add_workspace_folder, bufopts)
   map("n", "<leader>wr", lsp.buf.remove_workspace_folder, bufopts)
-  map("n", "<leader>wl", function() vim.pretty_print(vim.lsp.buf.list_workspace_folders()) end, bufopts)
+  map("n", "<leader>wl", function()
+    vim.pretty_print(vim.lsp.buf.list_workspace_folders())
+  end, bufopts)
   map("n", "<leader>rn", lsp.buf.rename, bufopts)
   map("n", "<leader>ca", lsp.buf.code_action, bufopts)
   map("n", "<leader>rf", lsp.buf.references, bufopts)
@@ -168,7 +169,7 @@ fn.sign_define("DiagnosticSignWarn", { texthl = "DiagnosticSignWarn", text = "�
 fn.sign_define("DiagnosticSignInfo", { texthl = "DiagnosticSignInfo", text = "■" })
 fn.sign_define("DiagnosticSignHint", { texthl = "DiagnosticSignHint", text = "□" })
 
-require('luasnip.loaders.from_vscode').lazy_load()
+require("luasnip.loaders.from_vscode").lazy_load()
 require("lsp_lines").setup()
 -- Use lsp_lines
 diagnostic.config {
@@ -232,11 +233,23 @@ function preview_location_callback(_, method, result)
     floating_buf, floating_win = preview_location(result, context)
   end
 end
-local completion_callback = function (client, bufnr)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', {noremap = true, silent = true})
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', {noremap = true, silent = true})
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', {noremap = true, silent = true})
-  require('completion').on_attach(client)
+local completion_callback = function(client, bufnr)
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", { noremap = true, silent = true })
+  vim.api.nvim_buf_set_keymap(
+    bufnr,
+    "n",
+    "gd",
+    "<cmd>lua vim.lsp.buf.definition()<CR>",
+    { noremap = true, silent = true }
+  )
+  vim.api.nvim_buf_set_keymap(
+    bufnr,
+    "n",
+    "gi",
+    "<cmd>lua vim.lsp.buf.implementation()<CR>",
+    { noremap = true, silent = true }
+  )
+  require("completion").on_attach(client)
 end
 
 function peek_definition()
@@ -249,21 +262,23 @@ function peek_definition()
 end
 
 local on_attach = function(client, bufnr)
-  api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
-  completion.on_attach({
-    sorting = 'alphabet',
-    matching_strategy_list = {'exact', 'fuzzy'},
+  api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
+  completion.on_attach {
+    sorting = "alphabet",
+    matching_strategy_list = { "exact", "fuzzy" },
     chain_complete_list = chain_complete_list,
-  })
+  }
   lsp_status.on_attach(client, bufnr)
   if client.server_capabilities.documentFormattingProvider then
-    vim.api.nvim_create_autocmd("BufWritePre",  {
-      group = vim.api.nvim_create_augroup("Fromat",  {clear = true }),
-      buffer =bufnr,
-      callback = function() vim.lsp.buf.formatting_seq_sync() end
+    vim.api.nvim_create_autocmd("BufWritePre", {
+      group = vim.api.nvim_create_augroup("Fromat", { clear = true }),
+      buffer = bufnr,
+      callback = function()
+        vim.lsp.buf.formatting_seq_sync()
+      end,
     })
- end
-  local opts = { noremap=true, silent=true }
+  end
+  local opts = { noremap = true, silent = true }
   api.nvim_create_autocmd("CursorHold", {
     buffer = bufnr,
     callback = function()
@@ -280,8 +295,9 @@ local on_attach = function(client, bufnr)
       end
 
       local cursor_pos = api.nvim_win_get_cursor(0)
-      if (cursor_pos[1] ~= vim.b.diagnostics_pos[1] or cursor_pos[2] ~= vim.b.diagnostics_pos[2])
-          and #diagnostic.get() > 0
+      if
+        (cursor_pos[1] ~= vim.b.diagnostics_pos[1] or cursor_pos[2] ~= vim.b.diagnostics_pos[2])
+        and #diagnostic.get() > 0
       then
         diagnostic.open_float(nil, float_opts)
       end
@@ -292,20 +308,20 @@ local on_attach = function(client, bufnr)
 
   -- The blow command will highlight the current variable and its usages in the buffer.
   if client.server_capabilities.documentHighlightProvider then
-    vim.cmd([[
+    vim.cmd [[
       hi! link LspReferenceRead Visual
       hi! link LspReferenceText Visual
       hi! link LspReferenceWrite Visual
-    ]])
+    ]]
 
     local gid = api.nvim_create_augroup("lsp_document_highlight", { clear = true })
 
-    api.nvim_create_autocmd("CursorMoved" , {
+    api.nvim_create_autocmd("CursorMoved", {
       group = gid,
       buffer = bufnr,
-      callback = function ()
+      callback = function()
         lsp.buf.clear_references()
-      end
+      end,
     })
   end
 
@@ -337,10 +353,10 @@ local function enable_diagnostics_hover()
 end
 
 local function disable_diagnostics_hover()
-  vim.api.nvim_clear_autocmds({ group = diagnostic_hover_augroup_name })
+  vim.api.nvim_clear_autocmds { group = diagnostic_hover_augroup_name }
 end
 
-vim.api.nvim_set_option('updatetime', 500)
+vim.api.nvim_set_option("updatetime", 500)
 enable_diagnostics_hover()
 
 -- diagnosticがある行でホバーをするとすぐにdiagnosticのfloating windowで上書きされてしまうのを阻止する
@@ -352,13 +368,16 @@ local function on_hover()
 
   vim.api.nvim_create_augroup("lspconfig-enable-diagnostics-hover", { clear = true })
   -- ウィンドウの切り替えなどのイベントが絡んでくるとおかしくなるかもしれない
-  vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, { group = "lspconfig-enable-diagnostics-hover", callback = function()
-    vim.api.nvim_clear_autocmds({ group = "lspconfig-enable-diagnostics-hover" })
-    enable_diagnostics_hover()
-  end })
+  vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
+    group = "lspconfig-enable-diagnostics-hover",
+    callback = function()
+      vim.api.nvim_clear_autocmds { group = "lspconfig-enable-diagnostics-hover" }
+      enable_diagnostics_hover()
+    end,
+  })
 end
 
-vim.keymap.set('n', '<Leader>lk', on_hover, opt)
+vim.keymap.set("n", "<Leader>lk", on_hover, opt)
 -- needed for sumneko_lua
 require("neodev").setup {}
 
@@ -366,28 +385,30 @@ local servers = {
   bashls = {},
   clangd = {
     cmd = {
-      'clangd', -- '--background-index',
-      '--clang-tidy', '--completion-style=bundled', '--header-insertion=iwyu',
-      '--suggest-missing-includes', '--cross-file-rename'
+      "clangd", -- '--background-index',
+      "--clang-tidy",
+      "--completion-style=bundled",
+      "--header-insertion=iwyu",
+      "--suggest-missing-includes",
+      "--cross-file-rename",
     },
     handlers = lsp_status.extensions.clangd.setup(),
     init_options = {
       clangdFileStatus = true,
       usePlaceholders = true,
       completeUnimported = true,
-      semanticHighlighting = true
-    }
+      semanticHighlighting = true,
+    },
   },
   cssls = {
-    filetypes = {"css", "scss", "less", "sass"},
-    root_dir = lspconfig.util.root_pattern("package.json", ".git")
+    filetypes = { "css", "scss", "less", "sass" },
+    root_dir = lspconfig.util.root_pattern("package.json", ".git"),
   },
-  ghcide = {
-  },
+  ghcide = {},
   html = {},
-  jsonls = {cmd = {'json-languageserver', '--stdio'}},
+  jsonls = { cmd = { "json-languageserver", "--stdio" } },
   julials = {
-    settings = {julia = {format = {indent = 2}}}
+    settings = { julia = { format = { indent = 2 } } },
   },
   ocamllsp = {},
   -- pyls_ms = {
@@ -447,26 +468,26 @@ local servers = {
     on_attach = lsp_status.on_attach,
     capabilities = lsp_status.capabilities,
     settings = {
-      ['rust-analyzer'] = {
+      ["rust-analyzer"] = {
         cargo = {
           allFeatures = true,
         },
         checkOnSave = {
           allFeatures = true,
-          command = 'clippy',
+          command = "clippy",
         },
         procMacro = {
           ignored = {
-            ['async-trait'] = { 'async_trait' },
-            ['napi-derive'] = { 'napi' },
-            ['async-recursion'] = { 'async_recursion' },
+            ["async-trait"] = { "async_trait" },
+            ["napi-derive"] = { "napi" },
+            ["async-recursion"] = { "async_recursion" },
           },
         },
       },
     },
   },
   sumneko_lua = {
-    cmd = {'lua-language-server'},
+    cmd = { "lua-language-server" },
     settings = {
       Lua = {
         diagnostics = {
@@ -476,29 +497,29 @@ local servers = {
         format = { enable = false },
         hint = { enable = true },
         -- completion = {keywordSnippet = 'Disable'},
-        runtime = {version = 'LuaJIT', path = vim.split(package.path, ';')},
+        runtime = { version = "LuaJIT", path = vim.split(package.path, ";") },
         workspace = {
           library = {
             library = library,
             maxPreload = 2000,
             preloadFileSize = 50000,
-            [vim.fn.expand("$VIMRUNTIME/lua")] = true,
-            [vim.fn.expand("$VIMRUNTIME/lua/vim/lsp")] = true,
+            [vim.fn.expand "$VIMRUNTIME/lua"] = true,
+            [vim.fn.expand "$VIMRUNTIME/lua/vim/lsp"] = true,
             unpack(api.list_runtime_paths()),
           },
           checkThirdParty = false,
         },
         completion = {
           enable = true,
-          showWord = 'Disable',
+          showWord = "Disable",
           callSnippet = "Both",
           -- keywordSnippet = 'Disable',
         },
         -- Do not send telemetry data containing a randomized but unique identifier
-         telemetry = {
-           enable = false,
-         },
-      }
+        telemetry = {
+          enable = false,
+        },
+      },
     },
     on_new_config = function(config, _)
       config.settings.Lua.workspace.library = api.get_runtime_file("", true)
@@ -506,25 +527,27 @@ local servers = {
   },
   texlab = {
     settings = {
-      latex = {forwardSearch = {executable = 'okular', args = {'--unique', 'file:%p#src:%l%f'}}}
+      latex = { forwardSearch = { executable = "okular", args = { "--unique", "file:%p#src:%l%f" } } },
     },
     commands = {
       TexlabForwardSearch = {
         function()
           local pos = vim.api.nvim_win_get_cursor(0)
           local params = {
-            textDocument = {uri = vim.uri_from_bufnr(0)},
-            position = {line = pos[1] - 1, character = pos[2]}
+            textDocument = { uri = vim.uri_from_bufnr(0) },
+            position = { line = pos[1] - 1, character = pos[2] },
           }
 
-          vim.lsp.buf_request(0, 'textDocument/forwardSearch', params, function(err, _, result, _)
-            if err then error(tostring(err)) end
-            print('Forward search ' .. vim.inspect(pos) .. ' ' .. texlab_search_status[result])
+          vim.lsp.buf_request(0, "textDocument/forwardSearch", params, function(err, _, result, _)
+            if err then
+              error(tostring(err))
+            end
+            print("Forward search " .. vim.inspect(pos) .. " " .. texlab_search_status[result])
           end)
         end,
-        description = 'Run synctex forward search'
-      }
-    }
+        description = "Run synctex forward search",
+      },
+    },
   },
   tsserver = {},
   vimls = {},
@@ -586,33 +609,33 @@ local servers = {
 -- end
 for _, lsp in ipairs(servers) do
   lsp_status.register_progress()
-  lsp_status.config({
+  lsp_status.config {
     kind_labels = vim.g.completion_customize_lsp_label,
     select_symbol = function(cursor_pos, symbol)
       if symbol.valueRange then
         local value_range = {
-          ['start'] = {
+          ["start"] = {
             character = 0,
-            line = vim.fn.byte2line(symbol.valueRange[1])
+            line = vim.fn.byte2line(symbol.valueRange[1]),
           },
-          ['end'] = {
+          ["end"] = {
             character = 0,
-            line = vim.fn.byte2line(symbol.valueRange[2])
-          }
+            line = vim.fn.byte2line(symbol.valueRange[2]),
+          },
         }
 
-        return require('lsp-status/util').in_range(cursor_pos, value_range)
+        return require("lsp-status/util").in_range(cursor_pos, value_range)
       end
     end,
     current_function = false,
-    status_symbol = '',
-    indicator_errors = 'e',
-    indicator_warnings = 'w',
-    indicator_info = 'i',
-    indicator_hint = 'h',
-    indicator_ok = '✔️',
-    spinner_frames = { '⣾', '⣽', '⣻', '⢿', '⡿', '⣟', '⣯', '⣷' },
-  })
+    status_symbol = "",
+    indicator_errors = "e",
+    indicator_warnings = "w",
+    indicator_info = "i",
+    indicator_hint = "h",
+    indicator_ok = "✔️",
+    spinner_frames = { "⣾", "⣽", "⣻", "⢿", "⡿", "⣟", "⣯", "⣷" },
+  }
   nvim_lsp[lsp].setup {
     on_attach = on_attach,
     capabilities = lsp_status.capabilities,
@@ -622,7 +645,7 @@ for _, lsp in ipairs(servers) do
     },
     settings = {
       solargraph = {
-        diagnostics = false
+        diagnostics = false,
       },
     },
     formatting = {

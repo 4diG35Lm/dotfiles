@@ -44,7 +44,7 @@ opt.shada = "'50,<1000,s100,\"1000,!" -- YankRing用に!を追加
 opt.shadafile = vim.fn.stdpath "state" .. "/shada/main.shada"
 vim.fn.mkdir(vim.fn.fnamemodify(vim.fn.expand(vim.g.viminfofile), ":h"), "p")
 opt.shellslash = true -- Windowsでディレクトリパスの区切り文字に / を使えるようにする
--- vim.o.lazyredraw   vim-anzuの検索結果が見えなくなることがあるためOFF
+opt.lazyredraw = true
 opt.complete = vim.o.complete .. ",k" -- 補完に辞書ファイル追加
 opt.completeopt = "menuone,noselect,noinsert"
 opt.history = 10000
@@ -113,8 +113,8 @@ opt.splitkeep = "cursor"
 opt.equalalways = false
 
 -- カーソルと表示
--- vim.opt.cursorline = true -- カーソルがある行を強調
--- vim.opt.cursorcolumn = true -- カーソルがある列を強調
+vim.opt.cursorline = true -- カーソルがある行を強調
+vim.opt.cursorcolumn = true -- カーソルがある列を強調
 
 -- クリップボード共有
 vim.opt.clipboard:append { "unnamedplus" } -- レジスタとクリップボードを共有

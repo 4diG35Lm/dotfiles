@@ -1,5 +1,8 @@
-local status, teskrun = pcall(require, "teskrun")
-if (not status) then return end
+-- custom.configs.taskrun
+local status, taskrun = pcall(require, "taskrun")
+if not status then
+	return
+end
 
 taskrun.setup()
 vim.api.nvim_set_keymap("n", "[_Make]m", "<Cmd>TaskRunToggle<CR>", { noremap = true, silent = true })

@@ -1,5 +1,10 @@
-local async = require "plenary.async"
-local uv = vim.loop
+-- custom.configs.plenary
+local status, plenary = pcall(require, "plenary")
+if not status then
+	return
+end
+local async = plenary.async
+local uv = vim.uv
 
 local read_file = function(path, callback)
   uv.fs_open(path, "r", 438, function(err, fd)

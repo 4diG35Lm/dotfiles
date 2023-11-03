@@ -77,7 +77,7 @@ M.load_mappings = function(section, mapping_opt)
     local mappings = require("core.utils").load_config().mappings
 
     if type(section) == "string" then
-      mappings[section]["plugin"] = nil
+      -- mappings[section]["plugin"] = nil
       mappings = { mappings[section] }
     end
 

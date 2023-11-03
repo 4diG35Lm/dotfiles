@@ -4,7 +4,7 @@ sidebar_nvim.setup({
 	disable_default_keybindings = 0,
 	bindings = {
 		["q"] = function()
-			sidebar_nvi.close()
+			sidebar_nvim.close()
 		end,
 	},
 	open = false,

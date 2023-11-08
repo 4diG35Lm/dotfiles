@@ -921,6 +921,17 @@ local plugins = {
       require "custom.configs.spellsitter"
     end,
   },
+  ---- CommentOut
+  { "thinca/vim-ambicmd", event = "VimEnter" },
+  {
+    "jghauser/mkdir.nvim",
+    lazy = false,
+    event = "VimEnter",
+    config = function()
+      require "mkdir"
+    end,
+  },
+
   ----  Command
   { "thinca/vim-ambicmd", event = "VimEnter" },
   {
@@ -1378,6 +1389,16 @@ local plugins = {
     },
     config = function()
       require "custom.configs.barbar"
+    end,
+  },
+  {
+    "vim-skk/skkeleton",
+    lazy = false,
+    dependencies = {
+      { "vim-denops/denops.vim" },
+    },
+    config = function()
+      require "custom.configs.skkeleton"
     end,
   },
   --  -- copilot

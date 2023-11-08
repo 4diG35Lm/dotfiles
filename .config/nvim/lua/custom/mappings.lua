@@ -1,4 +1,23 @@
 ---@type MappingsTable
+local g = vim.g -- Global variables
+local cmd = vim.cmd
+local fn = vim.fn
+local api = vim.api
+-- map functions
+_G["map"] = function(mode, lhs, rhs, opt)
+  vim.keymap.set(mode, lhs, rhs, opt or { silent = true })
+end
+
+for _, mode in pairs { "n", "v", "i", "o", "c", "t", "x", "t" } do
+  _G[mode .. "map"] = function(lhs, rhs, opt)
+    map(mode, lhs, rhs, opt)
+  end
+end
+
+-- options
+cmd "syntax enable"
+cmd "filetype plugin indent on"
+
 local M = {}
 
 M.general = {
@@ -81,10 +100,6 @@ local function toggle_lsp_lines()
   local lines_shown = require("lsp_lines").toggle()
   vim.diagnostic.config { signs = not lines_shown }
 end
-local function toggle_spellcheck()
-  vim.opt_local.spell = not (vim.opt_local.spell:get())
-  print("spell: " .. tostring(vim.opt_local.spell:get()))
-end
 local function toggle_dark_mode()
   if vim.o.background == "light" then
     vim.o.background = "dark"
@@ -94,10 +109,8 @@ local function toggle_dark_mode()
 end
 
 map("", "<Leader>l", toggle_lsp_lines, { desc = "Toggle lsp_lines" })
-map("n", "<Leader>s", toggle_spellcheck, { desc = "Toggle spellchecker" })
 map("n", "<Leader>d", toggle_dark_mode, { desc = "Toggle dark/light mode" })
 
--- XXX: Add git root name here?
 -- use  system('git rev-parse --show-toplevel 2> /dev/null') and some awk
 map("n", "<Leader>.", ":echo @%<CR>", { desc = "Echo filepath" })
 

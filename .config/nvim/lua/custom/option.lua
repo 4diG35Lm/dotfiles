@@ -8,6 +8,11 @@
 
 local g = vim.g -- Global variables
 local opt = vim.opt -- Set options (global/buffer/windows-scoped)
+local cmd = vim.cmd
+local fn = vim.fn
+local api = vim.api
+
+-- alias to vim's objects
 ----------------------------------------------------------
 -- General
 -----------------------------------------------------------
@@ -67,7 +72,7 @@ opt.shiftwidth = 2 -- Shift 2 spaces when tab
 opt.tabstop = 2 -- 1 tab == 2 spaces
 opt.smartindent = true -- Autoindent new lines
 opt.autoindent = true -- 自動インデント，スマートインデント
-opt.list = true
+opt.list = true -- 不可視文字可視化
 opt.listchars = "tab:» "
 -----------------------------------------------------------
 -- Memory, CPU
@@ -79,8 +84,6 @@ opt.synmaxcol = 240 -- Max column for syntax highlight
 -----------------------------------------------------------
 -- Startup
 -----------------------------------------------------------
--- Disable nvim intro
-opt.shortmess:append "sI"
 
 -- Insert
 opt.backspace = "indent,eol,start" -- バックスペースでなんでも消せるように

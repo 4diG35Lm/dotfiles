@@ -1,0 +1,9 @@
+!/.config/*
+**/.git/**
+**/.local/**
+*.exe
+*cache*
+*tmp*
+.DS_Store
+Thumbs.db
+*.log

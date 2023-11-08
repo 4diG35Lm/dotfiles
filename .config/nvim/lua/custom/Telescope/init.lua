@@ -1,5 +1,5 @@
-require("lazy").setup {
-  --------------------------------
+local fn, _, api = require("custom.core.utils").globals()
+return({
   ---- telescope.nvim
   {
     "nvim-telescope/telescope.nvim",
@@ -14,12 +14,16 @@ require("lazy").setup {
     },
     dependencies = {
       { "dressing.nvim" },
-      { "noice.nvim" },
+      {
+        "noice.nvim",
+        config = function()
+          require("telescope").load_extension "noice"
+        end,
+      },
       { "nvim-web-devicons" },
       { "plenary.nvim" },
       { "popup.nvim" },
       { "project.nvim" },
-      { "telescope-file-browser.nvim" },
       { "yanky.nvim" },
       { "trouble.nvim" },
       { "barrett-ruth/telescope-http.nvim" },
@@ -35,12 +39,6 @@ require("lazy").setup {
         "nvim-telescope/telescope-ui-select.nvim",
         config = function()
           require("telescope").load_extension "ui-select"
-        end,
-      },
-      {
-        "nvim-telescope/telescope-packer.nvim",
-        config = function()
-          require("telescope").load_extension "packer"
         end,
       },
       {
@@ -67,14 +65,14 @@ require("lazy").setup {
           require("telescope").load_extension "smart_history"
         end,
         build = function()
-          os.execute("mkdir -p " .. vim.fn.stdpath "state" .. "databases/")
+          os.execute("mkdir -p " .. fn.stdpath "state" .. "databases/")
         end,
       },
       { "nvim-telescope/telescope-symbols.nvim" },
       {
         "nvim-telescope/telescope-media-files.nvim",
         enabled = function()
-          return vim.fn.executable "ueberzug"
+          return fn.executable "ueberzug"
         end,
         config = function()
           require("telescope").load_extension "media_files"
@@ -107,12 +105,6 @@ require("lazy").setup {
       --I don't want to set items myself
       { "LinArcX/telescope-command-palette.nvim" },
       --> filer
-      {
-        "nvim-telescope/telescope-file-browser.nvim",
-        config = function()
-          require("telescope").load_extension "file_browser"
-        end,
-      },
       {
         "sunjon/telescope-arecibo.nvim",
         rocks = { "openssl", "lua-http-parser" },
@@ -149,7 +141,8 @@ require("lazy").setup {
       },
       {
         "nvim-telescope/telescope-fzf-native.nvim",
-        build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build",
+        build =
+        "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build",
       },
       {
         "debugloop/telescope-undo.nvim",
@@ -165,10 +158,22 @@ require("lazy").setup {
           require("telescope-tabs").setup {}
         end,
       },
-      { "smilovanovic/telescope-search-dir-picker.nvim" },
+      { "prochri/telescope-all-recent.nvim" },
+      {
+        "smilovanovic/telescope-search-dir-picker.nvim",
+        config = function()
+          require("telescope").load_extension "search_dir_picker"
+        end,
+      },
+      {
+        "rcarriga/nvim-notify",
+        config = function()
+          require("telescope").load_extension.notify.notify()
+        end,
+      },
     },
     config = function()
-      require "Telescope/config"
+      require "custom.Telescope.config"
     end,
   },
-}
+})

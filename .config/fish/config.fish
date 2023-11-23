@@ -5,7 +5,7 @@ end
 
 function cd
   builtin cd $argv
-    ls -a
+  ls -a
 end
 
 # ls
@@ -107,6 +107,9 @@ if test ! -L "$HOME/lib/ruby"
 end
 
 #}}}
+## lur {{{
+  eval (luarocks path --bin)
+# }}}
 #{{{ yarn
 #set -U fish_user_paths /usr/bin/yarn $fish_user_paths
 ##}}}
@@ -196,7 +199,15 @@ source $ALACRITTY_CONFIG_DIR/extra/completions/alacritty.fish
 set -gx ZELLIJ_CONFIG_DIR $XDG_CONFIG_HOME/zellij
 eval (zellij setup --generate-completion fish | source)
 # }}}
+function lg
+  set -gx LAZYGIT_NEW_DIR_FILE $HOME/.lazygit/newdir
+  lazygit "$argv"
 
+  if test -f $LAZY_NEW_DIR_FILE
+    cd (cat $LAZYGIT_NEW_DIR_FILE)
+    rm -f $LAZYGIT_NEW_DIR_FILE > /dev/null
+  end
+end
 # Start X at login {{{
 if status is-login
   if test -z "$DISPLAY" -a "$XDG_VTNR" = 1

@@ -6,12 +6,14 @@
 -- See: https://neovim.io/doc/user/vim_diff.html
 -- [2] Defaults - *nvim-defaults*
 
-local g = vim.g -- Global variables
-local opt = vim.opt -- Set options (global/buffer/windows-scoped)
+local api = vim.api
 local cmd = vim.cmd
 local fn = vim.fn
-local api = vim.api
+local g = vim.g -- Global variables
+local opt = vim.opt -- Set options (global/buffer/windows-scoped)
+local wo = vim.wo
 
+g.mapleader = " "
 -- alias to vim's objects
 ----------------------------------------------------------
 -- General
@@ -22,7 +24,7 @@ opt.swapfile = false -- Don't use swapfile
 opt.completeopt = "menuone,noinsert,noselect" -- Autocomplete options
 opt.shortmess = vim.o.shortmess .. "c"
 -- Buffers/Tabs/Windows
-vim.o.hidden = true
+opt.hidden = true
 -- Tab control
 opt.smarttab = true -- tab respects 'tabstop', 'shiftwidth', and 'softtabstop'
 opt.tabstop = 2 -- the visible width of tabs
@@ -31,26 +33,25 @@ opt.shiftwidth = 2 -- number of spaces to use for indent and unindent
 opt.shiftround = true -- round indent to a multiple of 'shiftwidth'
 
 -- Set spelling
-vim.o.spell = false
+opt.spell = false
 
 -- For git
-vim.wo.signcolumn = "yes"
+wo.signcolumn = "yes"
 
 -- Status line
-vim.o.showmode = false
+opt.showmode = false
 
 -- Better display
-vim.o.cmdheight = 2
+opt.cmdheight = 2
 
 g.mapleader = ","
 g.maplocalleader = "\\"
 
 opt.shada = "'50,<1000,s100,\"1000,!" -- YankRing用に!を追加
-opt.shadafile = vim.fn.stdpath "state" .. "/shada/main.shada"
-vim.fn.mkdir(vim.fn.fnamemodify(vim.fn.expand(vim.g.viminfofile), ":h"), "p")
+opt.shadafile = fn.stdpath("state") .. "/shada/main.shada"
+fn.mkdir(vim.fn.fnamemodify(vim.fn.expand(vim.g.viminfofile), ":h"), "p")
 opt.shellslash = true -- Windowsでディレクトリパスの区切り文字に / を使えるようにする
 opt.lazyredraw = true
-opt.complete = vim.o.complete .. ",k" -- 補完に辞書ファイル追加
 opt.completeopt = "menuone,noselect,noinsert"
 opt.history = 10000
 opt.timeout = true
@@ -91,7 +92,7 @@ opt.formatoptions = vim.o.formatoptions .. "m" -- 整形オプション，マル
 -- https://github.com/vim-jp/issues/issues/152 use nofixeol
 -- vim.o.binary noeol=true
 opt.fixendofline = false
--- vim.o.formatoptions=vim.o.formatoptions .. "j" -- Delete comment character when joining commented lines
+opt.formatoptions = vim.o.formatoptions .. "j" -- Delete comment character when joining commented lines
 
 -- 単語区切り設定 setting by vim-polyglot
 -- vim.o.iskeyword="48-57,192-255"
@@ -102,6 +103,7 @@ opt.wildmode = "longest,list,full" -- リスト表示，最長マッチ
 
 -- Search
 opt.wrapscan = true -- 最後まで検索したら先頭へ戻る
+opt.wrap = false
 
 -- vim.o.nowrapscan -- 最後まで検索しても先頭に戻らない
 opt.ignorecase = true -- 大文字小文字無視
@@ -116,11 +118,11 @@ opt.splitkeep = "cursor"
 opt.equalalways = false
 
 -- カーソルと表示
-vim.opt.cursorline = true -- カーソルがある行を強調
-vim.opt.cursorcolumn = true -- カーソルがある列を強調
+opt.cursorline = true -- カーソルがある行を強調
+opt.cursorcolumn = true -- カーソルがある列を強調
 
 -- クリップボード共有
-vim.opt.clipboard:append { "unnamedplus" } -- レジスタとクリップボードを共有
+vim.opt.clipboard:append({ "unnamedplus" }) -- レジスタとクリップボードを共有
 
 -- File
 -- vim.o.backup=false   -- バックアップ取らない
@@ -131,24 +133,22 @@ opt.hidden = true -- バッファを切り替えるときに
 --ファイルを保存しなくてもOKに
 opt.autoread = true -- 他で書き換えられたら自動で読み直す
 opt.backup = true
-opt.backupdir = vim.fn.stdpath "state" .. "/backup/"
-vim.fn.mkdir(vim.o.backupdir, "p")
+opt.backupdir = fn.stdpath("state") .. "/backup/"
+fn.mkdir(vim.o.backupdir, "p")
 -- vim.o.backupext = string.gsub(vim.o.backupext, "[vimbackup]", "")
-vim.o.backupskip = ""
-vim.o.directory = vim.fn.stdpath "state" .. "/swap/"
-vim.fn.mkdir(vim.o.directory, "p")
-vim.o.updatecount = 100
-vim.o.undofile = true
-vim.o.undodir = vim.fn.stdpath "state" .. "/undo/"
-vim.fn.mkdir(vim.o.undodir, "p")
-vim.o.modeline = false
--- vim.o.autochdir = true
+opt.backupskip = ""
+opt.directory = fn.stdpath("state") .. "/swap/"
+opt.updatecount = 100
+opt.undofile = true
+opt.undodir = fn.stdpath("state") .. "/undo/"
+opt.modeline = false
+opt.autochdir = true
 
 -- clipboard
 -- + reg: Ctrl-v nnamedplus
 -- * reg: middle click unnamed
-if vim.fn.has "clipboard" == 1 then
-  vim.o.clipboard = "unnamedplus,unnamed"
+if fn.has("clipboard") == 1 then
+  opt.clipboard = "unnamedplus,unnamed"
 end
 
 -- beep sound
@@ -158,7 +158,7 @@ opt.timeoutlen = 500
 
 -- Appearance
 ---------------------------------------------------------
-vim.o.termguicolors = true
+opt.termguicolors = true
 opt.wrap = true -- turn on line wrapping
 opt.wrapmargin = 8 -- wrap lines when coming within n characters from side
 opt.linebreak = true -- set soft wrapping
@@ -172,8 +172,8 @@ table.insert(opt.diffopt, "hiddenoff")
 opt.laststatus = 3 -- show the global statusline all the time
 
 -- tags
-opt.tags:remove { "./tags" }
-opt.tags:remove { "./tags;" }
+opt.tags:remove({ "./tags" })
+opt.tags:remove({ "./tags;" })
 opt.tags = "./tags," .. vim.go.tags
 
 -- session
@@ -183,17 +183,13 @@ opt.sessionoptions = "buffers,curdir,tabpages,winsize,globals"
 opt.switchbuf = "useopen,uselast"
 
 -- smart indent for long line
--- vim.o.breakindent=true
+opt.breakindent = true
 
 opt.pumblend = 0
-opt.wildoptions = vim.o.wildoptions .. ",pum"
 opt.spelllang = "en,cjk"
-vim.opt_local.spelloptions:append "noplainbuffer"
+vim.opt_local.spelloptions:append("noplainbuffer")
 opt.inccommand = "split"
 g.vimsyn_embed = "l"
-
--- diff
-opt.diffopt = vim.o.diffopt .. ",vertical,internal,algorithm:patience,iwhite,indent-heuristic"
 
 -- code folding settings
 opt.foldmethod = "expr"
@@ -205,17 +201,17 @@ opt.foldlevel = 1
 -- fix code folding. Without this autocmd, the message "E490: No fold found" is displayed
 -- anytime a fold is triggered, until the file is reloaded (for example, with `:e<cr>`)
 -- https://github.com/nvim-telescope/telescope.nvim/issues/699#issuecomment-1159637962
-vim.api.nvim_create_autocmd({ "BufEnter" }, { pattern = { "*" }, command = "normal zx" })
+api.nvim_create_autocmd({ "BufEnter" }, { pattern = { "*" }, command = "normal zx" })
 
 -- increment
-opt.nrformats:append "unsigned"
-opt.shortmess:append "c"
-opt.matchpairs:append {
+opt.nrformats:append("unsigned")
+vim.opt.shortmess:append("c")
+opt.matchpairs:append({
   "（:）",
   "「:」",
   "『:』",
   "【:】",
-}
+})
 opt.sessionoptions = {
   "buffers",
   "folds",
@@ -223,35 +219,35 @@ opt.sessionoptions = {
   "winsize",
 }
 
-if vim.fn.executable "rg" then
+if fn.executable("rg") then
   opt.grepprg = "rg --vimgrep --hidden --glob " .. "'!tags*'"
   opt.grepformat = "%f:%l:%c:%m,%f:%l:%m"
 end
 
 --
-g.python3_host_prog = (vim.fn.getenv "HOME") .. "/.local/share/nvim/venv/neovim/bin/python"
+g.python3_host_prog = (vim.fn.getenv("HOME")) .. "/.local/share/nvim/venv/neovim/bin/python"
 -- 最後の4文字が "fish" だったら "sh" にする
 if opt.shell:get():sub(#vim.opt.shell - 3) == "fish" then
-  opt.shell.set "sh"
+  opt.shell.set("sh")
 end
 
-if vim.fn.has "persistent_undo" then
+if fn.has("persistent_undo") then
   opt.undofile = true
 end
 
-vim.cmd "set whichwrap+=<,>,[,],h,l"
-vim.cmd [[set iskeyword+=-]]
-vim.cmd [[set formatoptions-=cro]] -- TODO: this doesn't seem to work
+cmd("set whichwrap+=<,>,[,],h,l")
+cmd([[set iskeyword+=-]])
+cmd([[set formatoptions-=cro]]) -- TODO: this doesn't seem to work
 
 -- =============================================================================
 -- = Theming and Looks =
 -- =============================================================================
-vim.wo.number = true
-vim.wo.relativenumber = true
-vim.o.termguicolors = true
+wo.number = true
+wo.relativenumber = true
+opt.termguicolors = true
 
 -- =============================================================================
 -- =  nvim-tree
 -- =============================================================================
-vim.g.loaded_netrw = 1
-vim.g.loaded_netrwPlugin = 1
+g.loaded_netrw = 1
+g.loaded_netrwPlugin = 1

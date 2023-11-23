@@ -1,5 +1,29 @@
+local api = vim.api
+local cmd = vim.cmd
+local env = vim.env
+local fn = vim.fn
+local g = vim.g
+local opt = vim.opt
+local wo = vim.wo
+-- Lazy redraw
+opt.lazyredraw = true
+
+-- local utils = require("utils")
+-- Neovim-specific configuration
+--
+-- require("globals")
+-- alias to vim's objects
+-- local imap = utils.imap
+--local inoremap = utils.inoremap
+--local nmap = utils.nmap
+--local nnoremap = utils.nnoremap
+--local omap = utils.omap
+--local termcodes = utils.termcodes
+-- local vmap = utils.vmap
+--local vnoremap = utils.vnoremap
+-- local xmap = utils.xmap
 -- custom.base
-vim.cmd "autocmd!"
+cmd("autocmd!")
 
 vim.scriptencoding = "utf-8"
 
@@ -7,23 +31,23 @@ vim.wo.number = true
 
 -- LANG
 
-if vim.fn.has "unix" == 1 then
-  vim.env.LANG = "en_US.UTF-8"
+if fn.has("unix") == 1 then
+  env.LANG = "en_US.UTF-8"
 else
-  vim.env.LANG = "en"
+  env.LANG = "en"
 end
-vim.cmd [[ "language " .. os.getenv("LANG") ]]
-vim.o.langmenu = os.getenv "LANG"
+cmd([[ "language " .. os.getenv("LANG") ]])
+opt.langmenu = os.getenv("LANG")
 
-vim.o.encoding = "utf-8"
-vim.o.fileencodings = "ucs-bom,utf-8,euc-jp,iso-2022-jp,cp932,sjis,latin1"
-vim.o.fileformats = "unix,dos,mac"
+opt.encoding = "utf-8"
+opt.fileencodings = "ucs-bom,utf-8,euc-jp,iso-2022-jp,cp932,sjis,latin1"
+opt.fileformats = "unix,dos,mac"
 -- vim.cmd [[ scriptencoding utf-8 ]]
 
 -- debug level
 -- vim.lsp.set_log_level('debug')
 ---@type integer
-local augroup = vim.api.nvim_create_augroup("vimrc", { clear = true })
+local augroup = api.nvim_create_augroup("vimrc", { clear = true })
 ---vimrc 専用の属性を格納するテーブル
 _G.vimrc = {
   -- operator
@@ -33,41 +57,14 @@ _G.vimrc = {
   state = {},
 }
 
-vim.cmd [[
+cmd([[
   filetype off
   filetype plugin indent off
-]]
--- Lazy redraw
-vim.o.lazyredraw = true
-
--- local utils = require("utils")
--- Neovim-specific configuration
---
--- require("globals")
--- alias to vim's objects
-local api = vim.api
-local cmd = vim.cmd
-local env = vim.env
-local fn = vim.fn
-local g = vim.g
--- local imap = utils.imap
-local indent = 2
---local inoremap = utils.inoremap
---local nmap = utils.nmap
---local nnoremap = utils.nnoremap
-local o = vim.o
---local omap = utils.omap
-local opt = vim.opt
---local termcodes = utils.termcodes
--- local vmap = utils.vmap
---local vnoremap = utils.vnoremap
-local wo = vim.wo
--- local xmap = utils.xmap
-
+]])
 -- create a completion_nvim table on _G which is visible via
 -- v:lua from vimscript
 _G.completion_nvim = {}
-termcodes = vim.api.nvim_replace_termcodes
+local termcodes = api.nvim_replace_termcodes
 function _G.completion_nvim.smart_pumvisible(vis_seq, not_vis_seq)
   if fn.pumvisible() == 1 then
     return termcodes(vis_seq)
@@ -129,12 +126,12 @@ for _, name in pairs(disable_plugins) do
   g[name] = true
 end
 
-cmd "filetype off"
-cmd "syntax off"
+cmd("filetype off")
+cmd("syntax off")
 -- eqaul to below setting
-cmd "autocmd TermOpen * startinsert"
+cmd("autocmd TermOpen * startinsert")
 
-cmd [[
+cmd([[
 if executable('fcitx5')
   let g:fcitx_state = 1
   augroup fcitx_savestate
@@ -144,7 +141,7 @@ if executable('fcitx5')
     autocmd InsertEnter * call system(g:fcitx_state == 1 ? 'fcitx5-remote -c': 'fcitx5-remote -o')
   augroup END
 endif
-]]
+]])
 
 local vars = {
   python_host_prog = "/usr/bin/python2",
@@ -156,25 +153,25 @@ for var, val in pairs(vars) do
   api.nvim_set_var(var, val)
 end
 
-cmd [[
+cmd([[
  filetype plugin indent on
  syntax enable
-]]
+]])
 -- make comments and HTML attributes italic
-cmd [[highlight Comment cterm=italic term=italic gui=italic]]
-cmd [[highlight htmlArg cterm=italic term=italic gui=italic]]
-cmd [[highlight xmlAttrib cterm=italic term=italic gui=italic]]
-cmd [[highlight Normal ctermbg=none]]
+cmd([[highlight Comment cterm=italic term=italic gui=italic]])
+cmd([[highlight htmlArg cterm=italic term=italic gui=italic]])
+cmd([[highlight xmlAttrib cterm=italic term=italic gui=italic]])
+cmd([[highlight Normal ctermbg=none]])
 
 -- https://github.com/neovim/neovim/issues/14090#issuecomment-1177933661
 -- vim.g.do_filetype_lua = 1
 -- vim.g.did_load_filetypes = 0
 
-opt.runtimepath:remove "/etc/xdg/nvim"
-opt.runtimepath:remove "/etc/xdg/nvim/after"
-opt.runtimepath:remove "/usr/share/vim/vimfiles"
+opt.runtimepath:remove("/etc/xdg/nvim")
+opt.runtimepath:remove("/etc/xdg/nvim/after")
+opt.runtimepath:remove("/usr/share/vim/vimfiles")
 
-vim.api.nvim_exec(
+api.nvim_exec(
   [[
     function! DisableST()
       return " "

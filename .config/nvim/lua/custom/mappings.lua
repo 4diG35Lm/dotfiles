@@ -8,15 +8,15 @@ _G["map"] = function(mode, lhs, rhs, opt)
   vim.keymap.set(mode, lhs, rhs, opt or { silent = true })
 end
 
-for _, mode in pairs { "n", "v", "i", "o", "c", "t", "x", "t" } do
+for _, mode in pairs({ "n", "v", "i", "o", "c", "t", "x", "t" }) do
   _G[mode .. "map"] = function(lhs, rhs, opt)
     map(mode, lhs, rhs, opt)
   end
 end
 
 -- options
-cmd "syntax enable"
-cmd "filetype plugin indent on"
+cmd("syntax enable")
+cmd("filetype plugin indent on")
 
 local M = {}
 
@@ -24,6 +24,19 @@ M.general = {
   n = {
     [";"] = { ":", "enter command mode", opts = { nowait = true } },
     ["C-h"] = { "NvimTreeToggle<cr>", "", opts = { silent = true, noremap = true } },
+  },
+}
+M.dap = {
+  plugin = true,
+  n = {
+    ["<leader>db"] = {
+      "<cmd> DapToggleBreakpoint <CR>",
+      "Add breakpoint at line",
+    },
+    ["<leader>dr"] = {
+      "<cmd> DapContinue <CR>",
+      "ne",
+    },
   },
 }
 
@@ -64,8 +77,8 @@ end
 --Remap space as leader key
 -- map("", "<Space>", "<Nop>", opts)
 
-vim.g.mapleader = " "
-vim.g.maplocalleader = " "
+g.mapleader = " "
+g.maplocalleader = " "
 
 -- Split window
 map("n", "ss", ":split<Return><C-w>w", opts)
@@ -98,7 +111,7 @@ vim.keymap.set("", "<Leader>t", ":TSPlaygroundToggle<CR>", { remap = true, desc 
 
 local function toggle_lsp_lines()
   local lines_shown = require("lsp_lines").toggle()
-  vim.diagnostic.config { signs = not lines_shown }
+  vim.diagnostic.config({ signs = not lines_shown })
 end
 local function toggle_dark_mode()
   if vim.o.background == "light" then
@@ -147,11 +160,11 @@ map("n", "<Leader>h", vim.lsp.buf.hover, { remap = true, desc = "Show hover deta
 
 -- TODO: I want this to close whenever i press enter on one
 map("n", "<Leader>r", function()
-  require("trouble").toggle "lsp_references"
+  require("trouble").toggle("lsp_references")
 end, { desc = "Show LSP references" })
 
 map("n", "<Leader>e", function()
-  require("trouble").toggle { "document_diagnostics", group = false }
+  require("trouble").toggle({ "document_diagnostics", group = false })
 end, { desc = "Show LSP errors/diagnostics" })
 
 map("n", "<Leader>R", function()
@@ -159,7 +172,7 @@ map("n", "<Leader>R", function()
 end, { desc = "Rename symbol under cursor" })
 -- Autoformatting
 map({ "n" }, "<Leader>a", function()
-  vim.lsp.buf.format { async = true }
+  vim.lsp.buf.format({ async = true })
 end, { remap = true, desc = "Autoformat code" })
 
 map({ "v" }, "<Leader>a", function()
@@ -198,7 +211,7 @@ map("n", "m", "[_Make]", {})
 -- TODO: It'd be great if files in pwd are weighted higher.
 local function fuzzy_finder()
   -- Exclude currently focused file from the list:
-  local current = vim.fn.expand "%"
+  local current = vim.fn.expand("%")
 
   -- "hidden" includes dotfiles, but not git-ignored files and alike.
   local cmd = "fd --type f --type symlink --hidden"
@@ -208,7 +221,7 @@ local function fuzzy_finder()
     -- FIXME: other files with the same name but different path are not included!
   end
 
-  require("fzf-lua").files { cmd = cmd }
+  require("fzf-lua").files({ cmd = cmd })
 end
 map("n", "<Leader>p", fuzzy_finder, { desc = "Open fuzzy finder" })
 map({ "n", "x" }, "z", "<Nop>", opts)
@@ -338,10 +351,10 @@ map("n", "<C-s>", "<C-w>p", opts)
 -- Focus floating window with <C-w><C-w>
 vim.keymap.set("n", "<C-w><C-w>", function()
   if vim.api.nvim_win_get_config(vim.fn.win_getid()).relative ~= "" then
-    vim.cmd [[ wincmd p ]]
+    vim.cmd([[ wincmd p ]])
     return
   end
-  for _, winnr in pairs(vim.fn.range(1, vim.fn.winnr "$")) do
+  for _, winnr in pairs(vim.fn.range(1, vim.fn.winnr("$"))) do
     local winid = vim.fn.win_getid(winnr)
     local conf = vim.api.nvim_win_get_config(winid)
     if conf.focusable and conf.relative ~= "" then
@@ -360,15 +373,15 @@ end, { noremap = true, silent = false })
 
 -- Automatically indent with i and A made by ycino
 vim.keymap.set("n", "i", function()
-  return vim.fn.len(vim.fn.getline ".") ~= 0 and "i" or '"_cc'
+  return vim.fn.len(vim.fn.getline(".")) ~= 0 and "i" or '"_cc'
 end, { noremap = true, expr = true, silent = true })
 vim.keymap.set("n", "A", function()
-  return vim.fn.len(vim.fn.getline ".") ~= 0 and "A" or '"_cc'
+  return vim.fn.len(vim.fn.getline(".")) ~= 0 and "A" or '"_cc'
 end, { noremap = true, expr = true, silent = true })
 
 -- toggle 0, ^ made by ycino
 vim.keymap.set("n", "0", function()
-  return string.match(vim.fn.getline("."):sub(0, vim.fn.col "." - 1), "^%s+$") and "0" or "^"
+  return string.match(vim.fn.getline("."):sub(0, vim.fn.col(".") - 1), "^%s+$") and "0" or "^"
 end, { noremap = true, expr = true, silent = true })
 -- map('n', '$',
 --                function()
@@ -539,22 +552,22 @@ end
 --end, opts)
 vim.keymap.set("n", "H", function()
   if is_normal_buffer() then
-    vim.cmd [[execute "bprev"]]
+    vim.cmd([[execute "bprev"]])
   end
 end, opts)
 vim.keymap.set("n", "L", function()
   if is_normal_buffer() then
-    vim.cmd [[execute "bnext"]]
+    vim.cmd([[execute "bnext"]])
   end
 end, opts)
 vim.keymap.set("n", "<C-S-Left>", function()
   if is_normal_buffer() then
-    vim.cmd [[execute "bprev"]]
+    vim.cmd([[execute "bprev"]])
   end
 end, opts)
 vim.keymap.set("n", "<C-S-Right>", function()
   if is_normal_buffer() then
-    vim.cmd [[execute "bnext"]]
+    vim.cmd([[execute "bnext"]])
   end
 end, opts)
 

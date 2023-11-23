@@ -6,16 +6,17 @@ autocmd("VimResized", {
   pattern = "*",
   command = "tabdo wincmd =",
 })
-require "custom.base"
-require "custom.display"
-require "custom.autocmd"
-require "custom.option"
-require "custom.func"
+--require("custom.lazy")
+require("custom.base")
+require("custom.display")
+require("custom.autocmd")
+require("custom.option")
+require("custom.func")
 if vim.g.vscode then
-  require "custom.vscode-neovim.mappings"
-  require "custom.vscode-neovim.options"
+  require("custom.vscode-neovim.mappings")
+  require("custom.vscode-neovim.options")
 end
 vim.defer_fn(function()
-  require "custom.command"
+  require("custom.command")
 end, 50)
-require "custom.utf8"
+require("custom.utf8")

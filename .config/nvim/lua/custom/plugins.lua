@@ -12,7 +12,7 @@ local plugins = {
       {
         "folke/neoconf.nvim",
         config = function()
-          require "custom.configs.neoconf"
+          require("custom.configs.neoconf")
         end,
       },
       {
@@ -26,7 +26,7 @@ local plugins = {
             lazy = false,
             event = { "FocusLost", "CursorHold" },
             config = function()
-              require "custom.configs.mason-tool-installer"
+              require("custom.configs.mason-tool-installer")
             end,
           },
         },
@@ -35,13 +35,13 @@ local plugins = {
         {
           "ray-x/lsp_signature.nvim",
           config = function()
-            require "custom.configs.lsp_signature"
+            require("custom.configs.lsp_signature")
           end,
         },
         {
           "tamago324/nlsp-settings.nvim",
           config = function()
-            require "custom.configs.nlsp-settings"
+            require("custom.configs.nlsp-settings")
           end,
         },
         --------------------------------
@@ -49,13 +49,13 @@ local plugins = {
         {
           "nvim-lua/lsp-status.nvim",
           config = function()
-            require "custom.configs.lsp-status"
+            require("custom.configs.lsp-status")
           end,
         },
         {
           "williamboman/mason.nvim",
           config = function()
-            require "custom.configs.mason"
+            require("custom.configs.mason")
           end,
         },
         {
@@ -65,12 +65,12 @@ local plugins = {
             { "nvim-lua/lsp_extensions.nvim" },
           },
           config = function()
-            require "custom.configs.mason-lspconfig"
+            require("custom.configs.mason-lspconfig")
           end,
         },
       },
       config = function()
-        require "custom.lsp.config"
+        require("custom.lsp.config")
       end, -- Override to setup mason-lspconfig
     },
   },
@@ -78,7 +78,7 @@ local plugins = {
   {
     "williamboman/mason.nvim",
     config = function()
-      require "custom.configs.mason"
+      require("custom.configs.mason")
     end, -- Override to setup mason-lspconfig
   },
   --------------------------------------------------------------
@@ -110,7 +110,7 @@ local plugins = {
       {
         "onsails/lspkind.nvim",
         config = function()
-          require "custom.configs.lspkind-nvim"
+          require("custom.configs.lspkind-nvim")
         end,
       },
       { "lukas-reineke/cmp-under-comparator" },
@@ -122,20 +122,20 @@ local plugins = {
           { "RishabhRD/popfix" },
         },
         config = function()
-          require "custom.configs.nvim-lsputils"
+          require("custom.configs.nvim-lsputils")
         end,
       },
       {
         "glepnir/lspsaga.nvim",
         event = "VimEnter",
         config = function()
-          require "custom.configs.lspsaga"
+          require("custom.configs.lspsaga")
         end,
       },
       {
         "folke/lsp-colors.nvim",
         config = function()
-          require "custom.configs.lsp-colors"
+          require("custom.configs.lsp-colors")
         end,
       },
       { "https://git.sr.ht/~whynothugo/lsp_lines.nvim" },
@@ -151,7 +151,7 @@ local plugins = {
       { "quangnguyen30192/cmp-nvim-ultisnips" },
     },
     config = function()
-      require "custom.cmp.config"
+      require("custom.cmp.config")
     end,
   },
   {
@@ -162,9 +162,10 @@ local plugins = {
       { "jay-babu/mason-null-ls.nvim" },
     },
     config = function()
-      require "custom.configs.none-ls"
+      require("custom.configs.none-ls")
     end,
   },
+
   --------------------------------
   --  Treesitter
   {
@@ -179,14 +180,14 @@ local plugins = {
       { "tree-sitter/tree-sitter-javascript" },
     },
     config = function()
-      require "custom.Treesitter.config"
+      require("custom.Treesitter.config")
     end,
   },
   {
     "mizlan/iswap.nvim",
     event = "VimEnter",
     config = function()
-      require "custom.configs.iswap"
+      require("custom.configs.iswap")
     end,
   },
 
@@ -199,7 +200,7 @@ local plugins = {
     "nvim-treesitter/nvim-treesitter-textobjects",
     lazy = true,
     config = function()
-      require "custom.configs.nvim-treesitter-textobjects"
+      require("custom.configs.nvim-treesitter-textobjects")
     end,
   },
   --------------------------------
@@ -220,7 +221,7 @@ local plugins = {
       {
         "noice.nvim",
         config = function()
-          require("telescope").load_extension "noice"
+          require("telescope").load_extension("noice")
         end,
       },
       { "nvim-web-devicons" },
@@ -236,74 +237,74 @@ local plugins = {
       {
         "nvim-telescope/telescope-github.nvim",
         config = function()
-          require("telescope").load_extension "gh"
+          require("telescope").load_extension("gh")
         end,
       },
       {
         "nvim-telescope/telescope-ui-select.nvim",
         config = function()
-          require("telescope").load_extension "ui-select"
+          require("telescope").load_extension("ui-select")
         end,
       },
       {
         "crispgm/telescope-heading.nvim",
         config = function()
-          require("telescope").load_extension "heading"
+          require("telescope").load_extension("heading")
         end,
       },
       {
         "LinArcX/telescope-changes.nvim",
         config = function()
-          require("telescope").load_extension "changes"
+          require("telescope").load_extension("changes")
         end,
       },
       {
         "nvim-telescope/telescope-live-grep-args.nvim",
         config = function()
-          require("telescope").load_extension "live_grep_args"
+          require("telescope").load_extension("live_grep_args")
         end,
       },
       {
         "nvim-telescope/telescope-smart-history.nvim",
         config = function()
-          require("telescope").load_extension "smart_history"
+          require("telescope").load_extension("smart_history")
         end,
         build = function()
-          os.execute("mkdir -p " .. vim.fn.stdpath "state" .. "databases/")
+          os.execute("mkdir -p " .. vim.fn.stdpath("state") .. "databases/")
         end,
       },
       { "nvim-telescope/telescope-symbols.nvim" },
       {
         "nvim-telescope/telescope-media-files.nvim",
         enabled = function()
-          return vim.fn.executable "ueberzug"
+          return vim.fn.executable("ueberzug")
         end,
         config = function()
-          require("telescope").load_extension "media_files"
+          require("telescope").load_extension("media_files")
         end,
       },
       {
         "nvim-telescope/telescope-project.nvim",
         config = function()
-          require("telescope").load_extension "project"
+          require("telescope").load_extension("project")
         end,
       },
       {
         "nvim-telescope/telescope-vimspector.nvim",
         config = function()
-          require("telescope").load_extension "vimspector"
+          require("telescope").load_extension("vimspector")
         end,
       },
       {
         "nvim-telescope/telescope-ghq.nvim",
         config = function()
-          require("telescope").load_extension "ghq"
+          require("telescope").load_extension("ghq")
         end,
       },
       {
         "nvim-telescope/telescope-fzf-writer.nvim",
         config = function()
-          require("telescope").load_extension "fzf_writer"
+          require("telescope").load_extension("fzf_writer")
         end,
       },
       --I don't want to set items myself
@@ -316,20 +317,20 @@ local plugins = {
           { "nvim-lua/plenary.nvim" },
         },
         config = function()
-          require("telescope").load_extension "file_browser"
+          require("telescope").load_extension("file_browser")
         end,
       },
       {
         "sunjon/telescope-arecibo.nvim",
         rocks = { "openssl", "lua-http-parser" },
         config = function()
-          require("telescope").load_extension "arecibo"
+          require("telescope").load_extension("arecibo")
         end,
       },
       {
         "LinArcX/telescope-command-palette.nvim",
         config = function()
-          require("telescope").load_extension "command_palette"
+          require("telescope").load_extension("command_palette")
         end,
       },
       {
@@ -361,21 +362,21 @@ local plugins = {
         "debugloop/telescope-undo.nvim",
         event = "VimEnter",
         config = function()
-          require("telescope").load_extension "undo"
+          require("telescope").load_extension("undo")
         end,
       },
       { "danielvolchek/tailiscope.nvim" },
       {
         "LukasPietzschmann/telescope-tabs",
         config = function()
-          require("telescope-tabs").setup {}
+          require("telescope-tabs").setup({})
         end,
       },
       { "prochri/telescope-all-recent.nvim" },
       {
         "smilovanovic/telescope-search-dir-picker.nvim",
         config = function()
-          require("telescope").load_extension "search_dir_picker"
+          require("telescope").load_extension("search_dir_picker")
         end,
       },
       {
@@ -386,7 +387,7 @@ local plugins = {
       },
     },
     config = function()
-      require "custom.Telescope.config"
+      require("custom.Telescope.config")
     end,
   },
 
@@ -394,7 +395,7 @@ local plugins = {
   {
     "NvChad/nvim-colorizer.lua",
     config = function()
-      require "custom.configs.nvim-colorizer"
+      require("custom.configs.nvim-colorizer")
     end,
     --enabled = false,
   },
@@ -411,13 +412,13 @@ local plugins = {
   {
     "rcarriga/nvim-notify",
     config = function()
-      require "custom.configs.notify"
+      require("custom.configs.notify")
     end,
   },
   {
     "MunifTanjim/nui.nvim",
     config = function()
-      require "custom.configs.nui"
+      require("custom.configs.nui")
     end,
   },
   --------------------------------
@@ -427,13 +428,13 @@ local plugins = {
     lazy = false,
     event = { "VeryLazy" },
     config = function()
-      require "custom.configs.dressing"
+      require("custom.configs.dressing")
     end, -- Override to setup mason-lspconfig
   },
   {
     "petertriho/nvim-scrollbar",
     config = function()
-      require "custom.configs.nvim-scrollbar"
+      require("custom.configs.nvim-scrollbar")
     end, -- Override to setup mason-lspconfig
   },
   ----------------------------------
@@ -449,7 +450,7 @@ local plugins = {
         "s1n7ax/nvim-window-picker",
         lazy = false,
         config = function()
-          require "custom.configs.nvim-window-picker"
+          require("custom.configs.nvim-window-picker")
         end, -- Override to setup mason-lspconfig
       },
       { "nvim-tree/nvim-web-devicons" }, -- not strictly required, but recommended
@@ -457,7 +458,7 @@ local plugins = {
       { "nvim-lua/plenary.nvim" },
     },
     config = function()
-      require "custom.configs.neo-tree"
+      require("custom.configs.neo-tree")
     end, -- Override to setup mason-lspconfig
   },
   --------------------------------
@@ -469,7 +470,7 @@ local plugins = {
     "lambdalisue/nerdfont.vim",
     lazy = false,
     config = function()
-      require "custom.configs.nerdfont"
+      require("custom.configs.nerdfont")
     end, -- Override to setup mason-lspconfig
   },
   -- Post-install/update hook with call of vimscript function with argument
@@ -486,7 +487,7 @@ local plugins = {
     "stevearc/conform.nvim",
     event = { "BufReadPre", "BufNewFile" }, -- to disable, comment this out
     config = function()
-      require "custom.configs.conform"
+      require("custom.configs.conform")
     end,
   },
   { "acro5piano/nvim-format-buffer" },
@@ -494,14 +495,14 @@ local plugins = {
     "mfussenegger/nvim-lint",
     event = "VeryLazy",
     config = function()
-      require "custom.configs.nvim-lint"
+      require("custom.configs.nvim-lint")
     end,
   },
   {
     "JohnnyMorganz/StyLua",
     event = "VeryLazy",
     config = function()
-      require "custom.configs.stylua"
+      require("custom.configs.stylua")
     end, -- Override to setup mason-lspconfig
   },
   --------------------------------------------------------------
@@ -532,7 +533,7 @@ local plugins = {
     "mizlan/iswap.nvim",
     event = "VimEnter",
     config = function()
-      require "custom.configs.iswap"
+      require("custom.configs.iswap")
     end,
   },
   --------------------------------
@@ -550,7 +551,7 @@ local plugins = {
       return not vim.g.vscode
     end,
     config = function()
-      require "custom.configs.bufferline"
+      require("custom.configs.bufferline")
     end,
   },
   ----------------------------------
@@ -561,42 +562,42 @@ local plugins = {
     "xiyaowong/nvim-cursorword",
     event = "VimEnter",
     config = function()
-      require "custom.configs.nvim-cursorword"
+      require("custom.configs.nvim-cursorword")
     end,
   },
   {
     "RRethy/vim-illuminate",
     event = "VimEnter",
     config = function()
-      require "custom.configs.vim-illuminate"
+      require("custom.configs.vim-illuminate")
     end,
   },
   {
     "m00qek/baleia.nvim",
     event = "VimEnter",
     config = function()
-      require "custom.configs.baleia"
+      require("custom.configs.baleia")
     end,
   },
   {
     "t9md/vim-quickhl",
     event = "VimEnter",
     config = function()
-      require "custom.configs.vim-quickhl"
+      require("custom.configs.vim-quickhl")
     end,
   },
   {
     "Pocco81/HighStr.nvim",
     event = "VimEnter",
     config = function()
-      require "custom.configs.HighStr"
+      require("custom.configs.HighStr")
     end,
   },
   {
     "Djancyp/better-comments.nvim",
     event = "VimEnter",
     config = function()
-      require "custom.configs.better-comments"
+      require("custom.configs.better-comments")
     end,
   },
   {
@@ -606,7 +607,7 @@ local plugins = {
       { "nvim-lua/plenary.nvim" },
     },
     config = function()
-      require "custom.configs.todo-comments"
+      require("custom.configs.todo-comments")
     end,
   },
   { "melkster/modicator.nvim", event = "VimEnter" },
@@ -627,7 +628,7 @@ local plugins = {
     lazy = false,
     event = "VimEnter",
     config = function()
-      require "custom.configs.stylish"
+      require("custom.configs.stylish")
     end,
   },
   --------------------------------
@@ -638,7 +639,7 @@ local plugins = {
     lazy = false,
     cmd = { "SpecsEnable" },
     config = function()
-      require "custom.configs.specs"
+      require("custom.configs.specs")
     end,
   },
   --  ------------------------------------------------------------
@@ -651,13 +652,13 @@ local plugins = {
     lazy = false,
     event = "VimEnter",
     config = function()
-      require "custom.configs.hop"
+      require("custom.configs.hop")
     end,
   },
   {
     "ThePrimeagen/harpoon",
     config = function()
-      require "custom.configs.harpoon"
+      require("custom.configs.harpoon")
     end,
   },
   ----------------
@@ -678,7 +679,7 @@ local plugins = {
     lazy = false,
     event = "VimEnter",
     config = function()
-      require "custom.configs.vim-edgemotion"
+      require("custom.configs.vim-edgemotion")
     end,
   },
   ----------------
@@ -688,7 +689,7 @@ local plugins = {
     lazy = false,
     event = "VimEnter",
     config = function()
-      require "custom.configs.CamelCaseMotion"
+      require("custom.configs.CamelCaseMotion")
     end,
   },
   { "yutkat/wb-only-current-line.nvim", event = "VimEnter" },
@@ -702,7 +703,7 @@ local plugins = {
       { "cbochs/grapple.nvim" },
     },
     config = function()
-      require "custom.configs.portal"
+      require("custom.configs.portal")
     end,
   },
   --  ->  bufferline
@@ -713,7 +714,7 @@ local plugins = {
     "XXiaoA/ns-textobject.nvim",
     event = "VimEnter",
     config = function()
-      require "custom.configs.ns-textobject"
+      require("custom.configs.ns-textobject")
     end,
   },
   --------------------------------
@@ -722,7 +723,7 @@ local plugins = {
     "gbprod/substitute.nvim",
     event = "VimEnter",
     config = function()
-      require "custom.configs.substitute"
+      require("custom.configs.substitute")
     end,
   },
 
@@ -731,7 +732,7 @@ local plugins = {
     lazy = false,
     event = "VimEnter",
     config = function()
-      require "custom.configs.nvim-surround"
+      require("custom.configs.nvim-surround")
     end,
   },
   -----------------
@@ -741,7 +742,7 @@ local plugins = {
     lazy = false,
     event = "VimEnter",
     config = function()
-      require "custom.configs.nvim-trevJ"
+      require("custom.configs.nvim-trevJ")
     end,
   },
   -----------------
@@ -752,7 +753,7 @@ local plugins = {
     lazy = false,
     event = "VimEnter",
     config = function()
-      require "custom.configs.dial"
+      require("custom.configs.dial")
     end,
   },
   --------------------------------
@@ -762,7 +763,7 @@ local plugins = {
     lazy = false,
     event = "VimEnter",
     config = function()
-      require "custom.configs.nvim-pasta"
+      require("custom.configs.nvim-pasta")
     end,
   },
   { "yutkat/osc52.nvim", event = "VimEnter" },
@@ -774,7 +775,7 @@ local plugins = {
     lazy = false,
     event = "VimEnter",
     config = function()
-      require "custom.configs.registers"
+      require("custom.configs.registers")
     end,
   },
   { "deris/vim-pasta", event = "VimEnter" },
@@ -787,7 +788,7 @@ local plugins = {
     lazy = false,
     event = "VimEnter",
     config = function()
-      require "custom.configs.nvim-hlslens"
+      require("custom.configs.nvim-hlslens")
     end,
   },
   --------------------------------
@@ -801,7 +802,7 @@ local plugins = {
     lazy = false,
     event = "VimEnter",
     config = function()
-      require "custom.configs.nvim-spectre"
+      require("custom.configs.nvim-spectre")
     end,
   },
   --------------------------------------------------------------
@@ -816,7 +817,7 @@ local plugins = {
     lazy = false,
     event = "VimEnter",
     config = function()
-      require "custom.configs.bufdelete"
+      require("custom.configs.bufdelete")
     end,
   },
   --------------------------------
@@ -826,7 +827,7 @@ local plugins = {
     lazy = false,
     event = "VimEnter",
     config = function()
-      require "custom.configs.stickybuf"
+      require("custom.configs.stickybuf")
     end,
   },
   --------------------------------
@@ -839,7 +840,7 @@ local plugins = {
     lazy = false,
     event = "VimEnter",
     config = function()
-      require "custom.configs.nvim-window-picker"
+      require("custom.configs.nvim-window-picker")
     end,
   },
   --  use  {'andymass/vim-tradewinds',  event   =  "WinNew"  },
@@ -848,7 +849,7 @@ local plugins = {
     lazy = false,
     event = "WinNew",
     config = function()
-      require "custom.configs.bufresize"
+      require("custom.configs.bufresize")
     end,
   },
   ------------------------------------------------------------
@@ -864,7 +865,7 @@ local plugins = {
     lazy = false,
     event = "VimEnter",
     config = function()
-      require "custom.configs.marks"
+      require("custom.configs.marks")
     end,
   },
   --  --------------------------------
@@ -874,7 +875,7 @@ local plugins = {
     lazy = false,
     event = "VimEnter",
     config = function()
-      require "custom.configs.nvim-bqf"
+      require("custom.configs.nvim-bqf")
     end,
   },
   {
@@ -882,7 +883,7 @@ local plugins = {
     lazy = false,
     event = "VimEnter",
     config = function()
-      require "custom.configs.replacer"
+      require("custom.configs.replacer")
     end,
   },
   {
@@ -890,7 +891,7 @@ local plugins = {
     lazy = false,
     event = "VimEnter",
     config = function()
-      require "custom.configs.qf_helper"
+      require("custom.configs.qf_helper")
     end,
   },
   --------------------------------
@@ -899,14 +900,14 @@ local plugins = {
     "jedrzejboczar/possession.nvim",
     lazy = false,
     config = function()
-      require "custom.configs.possession"
+      require("custom.configs.possession")
     end,
   },
   {
     "olimorris/persisted.nvim",
     lazy = false,
     config = function()
-      require "custom.configs.persisted"
+      require("custom.configs.persisted")
     end,
   },
   --------------------------------
@@ -918,7 +919,7 @@ local plugins = {
       { "nvim-treesitter" },
     },
     config = function()
-      require "custom.configs.spellsitter"
+      require("custom.configs.spellsitter")
     end,
   },
   ---- CommentOut
@@ -928,7 +929,7 @@ local plugins = {
     lazy = false,
     event = "VimEnter",
     config = function()
-      require "mkdir"
+      require("mkdir")
     end,
   },
 
@@ -939,7 +940,7 @@ local plugins = {
     lazy = false,
     event = "VimEnter",
     config = function()
-      require "mkdir"
+      require("mkdir")
     end,
   },
   { "yutkat/confirm-quit.nvim", event = "VimEnter" },
@@ -953,7 +954,7 @@ local plugins = {
       { "MunifTanjim/nui.nvim" },
     },
     config = function()
-      require "custom.configs.noice"
+      require("custom.configs.noice")
     end,
   },
   --------------------------------------------------------------
@@ -965,7 +966,7 @@ local plugins = {
     lazy = false,
     event = "VimEnter",
     config = function()
-      require "custom.configs.translate"
+      require("custom.configs.translate")
     end,
   },
   --------------------------------
@@ -979,7 +980,7 @@ local plugins = {
       { "renerocksai/calendar-vim" },
     },
     config = function()
-      require "custom.configs.telekasten"
+      require("custom.configs.telekasten")
     end,
   },
   --------------------------------
@@ -992,7 +993,7 @@ local plugins = {
       { "lewis6991/gitsigns.nvim" },
     },
     config = function()
-      require "custom.configs.hydra"
+      require("custom.configs.hydra")
     end,
   },
   --------------------------------
@@ -1002,7 +1003,7 @@ local plugins = {
     "lewis6991/impatient.nvim",
     lazy = false,
     config = function()
-      require "impatient"
+      require("impatient")
     end,
   },
   --------------------------------
@@ -1011,6 +1012,30 @@ local plugins = {
   --------------------------------------------------------------
   ----  Coding
   ----------------------------------
+  { "vim-jp/vimdoc-ja", lazy = false },
+  { "thinca/vim-qfreplace", cmd = "Qfreplace" },
+  { "thinca/vim-quickrun", cmd = "QuickRun" },
+  {
+    "skanehira/denops-translate.vim",
+    lazy = false,
+    dependencies = { "vim-denops/denops.vim" },
+  },
+  {
+    "kat0h/bufpreview.vim",
+    lazy = false,
+    dependencies = { "vim-denops/denops.vim" },
+    build = "deno task prepare",
+  },
+  {
+    "akinsho/toggleterm.nvim",
+  },
+  {
+    "pechorin/any-jump.vim",
+    cmd = { "AnyJump", "AnyJumpVisual", "AnyJumpBack", "AnyJumpLastResults" },
+    config = function()
+      require("custom.configs.any-jump")
+    end,
+  },
   ----  Writing  assistant
   --  Reading  assistant
   { "kristijanhusak/line-notes.nvim", event = "VimEnter" },
@@ -1021,7 +1046,7 @@ local plugins = {
     lazy = false,
     event = "VimEnter",
     config = function()
-      require "custom.configs.Comment"
+      require("custom.configs.Comment")
     end,
   },
   --------------------------------
@@ -1032,7 +1057,7 @@ local plugins = {
     lazy = false,
     event = "VimEnter",
     config = function()
-      require "custom.configs.autoclose"
+      require("custom.configs.autoclose")
     end,
   },
   --  focus  mode.  Might  not  ever  it.
@@ -1055,7 +1080,7 @@ local plugins = {
     lazy = false,
     event = "VimEnter",
     config = function()
-      require "custom.configs.other"
+      require("custom.configs.other")
     end,
   },
   --------------------------------
@@ -1065,7 +1090,7 @@ local plugins = {
     lazy = false,
     event = "VimEnter",
     config = function()
-      require "custom.configs.nvim-test"
+      require("custom.configs.nvim-test")
     end,
   },
   --------------------------------
@@ -1074,14 +1099,14 @@ local plugins = {
     "stevearc/overseer.nvim",
     event = "VimEnter",
     config = function()
-      require "custom.configs.overseer"
+      require("custom.configs.overseer")
     end,
   },
   {
     "yutkat/taskrun.nvim",
     lazy = false,
     config = function()
-      require "custom.configs.taskrun"
+      require("custom.configs.taskrun")
     end,
   },
   ----------------------------------
@@ -1091,7 +1116,7 @@ local plugins = {
     lazy = false,
     event = "VimEnter",
     config = function()
-      require "custom.configs.trim"
+      require("custom.configs.trim")
     end,
   },
   --------------------------------
@@ -1105,7 +1130,7 @@ local plugins = {
     event = "VimEnter",
     build = "make install_jsregexp",
     config = function()
-      require "custom.configs.LuaSnip"
+      require("custom.configs.LuaSnip")
     end,
   },
   ----  Snippet  Pack
@@ -1117,17 +1142,23 @@ local plugins = {
     "klen/nvim-config-local",
     lazy = false,
     config = function()
-      require "custom.configs.nvim-config-local"
+      require("custom.configs.nvim-config-local")
     end,
   },
   --------------------------------
   ----  Git
   {
+    "akinsho/toggleterm.nvim",
+    config = function()
+      require("custom.configs.toggleterm")
+    end,
+  },
+  {
     "TimUntersberger/neogit",
     lazy = false,
     event = "BufReadPre",
     config = function()
-      require "custom.configs.neogit"
+      require("custom.configs.neogit")
     end,
   },
   { "akinsho/git-conflict.nvim", event = "VimEnter" },
@@ -1136,7 +1167,7 @@ local plugins = {
     lazy = false,
     event = "VimEnter",
     config = function()
-      require "custom.configs.gitsigns"
+      require("custom.configs.gitsigns")
     end,
   },
   {
@@ -1144,7 +1175,7 @@ local plugins = {
     lazy = false,
     event = "VimEnter",
     config = function()
-      require "custom.configs.diffview"
+      require("custom.configs.diffview")
     end,
   },
   --------------------------------
@@ -1156,14 +1187,14 @@ local plugins = {
       { "mfussenegger/nvim-dap" },
     },
     config = function()
-      require "custom.configs.nvim-dap-ui"
+      require("custom.configs.nvim-dap-ui")
     end,
   },
   {
     "theHamsta/nvim-dap-virtual-text",
     lazy = false,
     config = function()
-      require "custom.configs.nvim-dap-virtual-text"
+      require("custom.configs.nvim-dap-virtual-text")
     end,
   },
   {
@@ -1174,7 +1205,7 @@ local plugins = {
       { "rcarriga/nvim-dap-ui" },
     },
     config = function()
-      require "custom.configs.nvim-dap-python"
+      require("custom.configs.nvim-dap-python")
     end,
   },
   {
@@ -1188,7 +1219,8 @@ local plugins = {
       { "mxsdev/nvim-dap-vscode-js", build = "npm install --legacy-peer-deps && npm run compile" },
     },
     config = function()
-      require "custom.configs.nvim-dap"
+      require("custom.configs.nvim-dap")
+      require("core.utils").load_mappings("dap")
     end,
   },
   --  archived
@@ -1197,7 +1229,7 @@ local plugins = {
     lazy = false,
     event = "VimEnter",
     config = function()
-      require "custom.configs.debugprint"
+      require("custom.configs.debugprint")
     end,
   },
   --------------------------------
@@ -1207,7 +1239,7 @@ local plugins = {
     lazy = false,
     event = "VimEnter",
     config = function()
-      require "custom.configs.iron"
+      require("custom.configs.iron")
     end,
   },
   --------------------------------------------------------------
@@ -1219,7 +1251,7 @@ local plugins = {
     lazy = false,
     event = "VimEnter",
     config = function()
-      require "custom.configs.package-info"
+      require("custom.configs.package-info")
     end,
   },
   --------------------------------
@@ -1234,7 +1266,7 @@ local plugins = {
     },
     ft = { "rust" },
     config = function()
-      require "custom.configs.rust-tools"
+      require("custom.configs.rust-tools")
     end,
   },
   --------------------------------
@@ -1252,7 +1284,7 @@ local plugins = {
     lazy = false,
     ft = { "csv" },
     config = function()
-      require "custom.configs.csv-tools"
+      require("custom.configs.csv-tools")
     end,
   },
   --------------------------------
@@ -1262,7 +1294,7 @@ local plugins = {
     "rust-lang/rust.vim",
     lazy = false,
     config = function()
-      require "custom.configs.rust"
+      require("custom.configs.rust")
     end,
   },
   --  Python
@@ -1270,7 +1302,7 @@ local plugins = {
   {
     "preservim/vim-markdown",
     config = function()
-      require "custom.configs.vim-markdown"
+      require("custom.configs.vim-markdown")
     end,
   },
   { "justinmk/vim-syntax-extra" },
@@ -1291,7 +1323,7 @@ local plugins = {
       { "nvim-zh/colorful-winsep.nvim" },
     },
     config = function()
-      require "custom.configs.indent-blankline"
+      require("custom.configs.indent-blankline")
     end,
   },
   { "f-person/git-blame.nvim" },
@@ -1305,7 +1337,7 @@ local plugins = {
       { "kevinhwang91/promise-async" },
     },
     config = function()
-      require "custom.configs.nvim-ufo"
+      require("custom.configs.nvim-ufo")
     end,
   },
   --  Comment
@@ -1313,7 +1345,7 @@ local plugins = {
     "b3nj5m1n/kommentary",
     lazy = false,
     config = function()
-      require "custom.configs.kommentary"
+      require("custom.configs.kommentary")
     end,
   },
   --  outline
@@ -1326,13 +1358,13 @@ local plugins = {
         lazy = true,
         dependencies = { "nvim-tree/nvim-web-devicons" },
         config = function()
-          require "custom.configs.lualine"
+          require("custom.configs.lualine")
         end,
       },
       { "nvim-tree/nvim-web-devicons", lazy = true },
     },
     config = function()
-      require "custom.configs.tabline"
+      require("custom.configs.tabline")
     end,
   },
   { "tjdevries/manillua.nvim", event = "VimEnter" },
@@ -1345,14 +1377,14 @@ local plugins = {
     lazy = false,
     event = { "BufRead", "BufNewFile" },
     config = function()
-      require "custom.configs.project"
+      require("custom.configs.project")
     end,
   },
   {
     "mvllow/modes.nvim",
     lazy = false,
     config = function()
-      require "custom.configs.modes"
+      require("custom.configs.modes")
     end,
   },
   --  Search
@@ -1370,7 +1402,7 @@ local plugins = {
     "nathom/filetype.nvim",
     lazy = false,
     config = function()
-      require "custom.configs.filetype"
+      require("custom.configs.filetype")
     end,
   },
   { "cespare/vim-toml" },
@@ -1388,7 +1420,7 @@ local plugins = {
       { "nvim-tree/nvim-web-devicons" }, -- OPTIONAL: for file icons
     },
     config = function()
-      require "custom.configs.barbar"
+      require("custom.configs.barbar")
     end,
   },
   {
@@ -1398,9 +1430,16 @@ local plugins = {
       { "vim-denops/denops.vim" },
     },
     config = function()
-      require "custom.configs.skkeleton"
+      require("custom.configs.skkeleton")
     end,
   },
+  {
+    "tkmpypy/chowcho.nvim",
+    config = function()
+      require("custom.configs.chowcho")
+    end,
+  },
+
   --  -- copilot
   --  {
   --    "github/copilot.vim",

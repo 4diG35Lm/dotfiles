@@ -1,33 +1,46 @@
-return ({
-  {
-    "nvim-treesitter/nvim-treesitter",
-    event = { "VimEnter" },
-    build = ":TSUpdate",
-    dependencies = {
-      { "nvim-treesitter/nvim-tree-docs" },
-      { "vigoux/architext.nvim" },
-      { "yioneko/nvim-yati" },
-      { "tree-sitter-javascript" },
-      { "tree-sitter/tree-sitter-javascript" },
-      { "tree-sitter/tree-sitter-python" },
-      { "nvim-treesitter/nvim-treesitter-context" },
+require("lazy").setup({
+--  --------------------------------
+--  --  Treesitter
+  {  "nvim-treesitter/nvim-treesitter",
+    event   =  {
+      {  "VimEnter"  },
     },
-    config = function()
-      require "custom.Treesitter.config"
+    build   =  ":TSUpdate",
+    dependencies   =  {
+      {  "nvim-treesitter/nvim-tree-docs"  },
+      {  "vigoux/architext.nvim"  },
+      {  "yioneko/nvim-yati"  },
+    },
+    config   =  function()
+      require("rc/pluginconfig/nvim-treesitter")
     end,
   },
-  {
-    "mizlan/iswap.nvim",
-    event = "VimEnter",
-    config = function()
-      require "custom.configs.iswap"
+  {  "bryall/contextprint.nvim",
+    dependencies   =  {
+      {  "nvim-treesitter"  },
+    },
+    config   =  function()
+      require("rc/pluginconfig/contextprint")
+    end,
+  },
+  {  "mizlan/iswap.nvim",
+    event   =  "VimEnter",
+    config   =  function()
+      require("rc/pluginconfig/iswap")
     end,
   },
 
-  { "David-Kunz/treesitter-unit",  event = "VimEnter" },
+  {  "David-Kunz/treesitter-unit",  event   =  "VimEnter",  },
   --------------------------------
   ----  Treesitter  UI  customize
-  { "haringsrob/nvim_context_vt",  event = "VimEnter" },
-  { "David-Kunz/treesitter-unit",  event = "VimEnter" },
-  --------------------------------
+  {  "haringsrob/nvim_context_vt",  event   =  "VimEnter",  },
+  {  "SmiteshP/nvim-gps",
+    dependencies   =  {
+      {  "nvim-treesitter/nvim-treesitter"  },
+    },
+    config  =  function()
+      require("rc/pluginconfig/nvim-gps")
+    end,
+  },
+  {  "David-Kunz/treesitter-unit",  event   =  "VimEnter",  },
 })

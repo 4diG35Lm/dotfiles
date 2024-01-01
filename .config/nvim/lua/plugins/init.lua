@@ -55,21 +55,21 @@ local default_plugins = {
     end,
   },
 
-  {
-    "lukas-reineke/indent-blankline.nvim",
-    version = "2.20.7",
-    init = function()
-      require("core.utils").lazy_load "indent-blankline.nvim"
-    end,
-    opts = function()
-      return require("plugins.configs.others").blankline
-    end,
-    config = function(_, opts)
-      require("core.utils").load_mappings "blankline"
-      dofile(vim.g.base46_cache .. "blankline")
-      require("indent_blankline").setup(opts)
-    end,
-  },
+--   {
+--     "lukas-reineke/indent-blankline.nvim",
+--     version = "2.20.7",
+--     init = function()
+--       require("core.utils").lazy_load "indent-blankline.nvim"
+--     end,
+--     opts = function()
+--       return require("plugins.configs.others").blankline
+--     end,
+--     config = function(_, opts)
+--       require("core.utils").load_mappings "blankline"
+--       dofile(vim.g.base46_cache .. "blankline")
+--       require("indent_blankline").setup(opts)
+--     end,
+--   },
 
   {
     "nvim-treesitter/nvim-treesitter",
@@ -96,13 +96,18 @@ local default_plugins = {
       vim.api.nvim_create_autocmd({ "BufRead" }, {
         group = vim.api.nvim_create_augroup("GitSignsLazyLoad", { clear = true }),
         callback = function()
-          vim.fn.system("git -C " .. '"' .. vim.fn.expand "%:p:h" .. '"' .. " rev-parse")
-          if vim.v.shell_error == 0 then
-            vim.api.nvim_del_augroup_by_name "GitSignsLazyLoad"
-            vim.schedule(function()
-              require("lazy").load { plugins = { "gitsigns.nvim" } }
-            end)
-          end
+          vim.fn.jobstart({"git", "-C", vim.loop.cwd(), "rev-parse"},
+            {
+              on_exit = function(_, return_code)
+                if return_code == 0 then
+                  vim.api.nvim_del_augroup_by_name "GitSignsLazyLoad"
+                  vim.schedule(function()
+                    require("lazy").load { plugins = { "gitsigns.nvim" } }
+                  end)
+                end
+              end
+            }
+          )
         end,
       })
     end,
@@ -118,7 +123,7 @@ local default_plugins = {
   -- lsp stuff
   {
     "williamboman/mason.nvim",
-    cmd = { "Mason", "MasonInstall", "MasonInstallAll", "MasonUninstall", "MasonUninstallAll", "MasonLog" },
+    cmd = { "Mason", "MasonInstall", "MasonInstallAll", "MasonUpdate" },
     opts = function()
       return require "plugins.configs.mason"
     end,
@@ -212,24 +217,24 @@ local default_plugins = {
   },
 
   -- file managing , picker etc
-  {
-    "nvim-tree/nvim-tree.lua",
-    cmd = { "NvimTreeToggle", "NvimTreeFocus" },
-    init = function()
-      require("core.utils").load_mappings "nvimtree"
-    end,
-    opts = function()
-      return require "plugins.configs.nvimtree"
-    end,
-    config = function(_, opts)
-      dofile(vim.g.base46_cache .. "nvimtree")
-      require("nvim-tree").setup(opts)
-    end,
-  },
+--   {
+--     "nvim-tree/nvim-tree.lua",
+--     cmd = { "NvimTreeToggle", "NvimTreeFocus" },
+--     init = function()
+--       require("core.utils").load_mappings "nvimtree"
+--     end,
+--     opts = function()
+--       return require "plugins.configs.nvimtree"
+--     end,
+--     config = function(_, opts)
+--       dofile(vim.g.base46_cache .. "nvimtree")
+--       require("nvim-tree").setup(opts)
+--     end,
+--   },
 
   {
     "nvim-telescope/telescope.nvim",
-    dependencies = "nvim-treesitter/nvim-treesitter",
+    dependencies = { "nvim-treesitter/nvim-treesitter", { "nvim-telescope/telescope-fzf-native.nvim", build = "make" } },
     cmd = "Telescope",
     init = function()
       require("core.utils").load_mappings "telescope"
@@ -252,10 +257,11 @@ local default_plugins = {
   -- Only load whichkey after all the gui
   {
     "folke/which-key.nvim",
-    keys = { "<leader>", '"', "'", "`", "c", "v", "g" },
+    keys = { "<leader>", "<c-r>", "<c-w>", '"', "'", "`", "c", "v", "g" },
     init = function()
       require("core.utils").load_mappings "whichkey"
     end,
+    cmd = "WhichKey",
     config = function(_, opts)
       dofile(vim.g.base46_cache .. "whichkey")
       require("which-key").setup(opts)

@@ -30,10 +30,6 @@ local function map(mode, lhs, rhs, opts)
   keymap.set(mode, lhs, rhs, options)
 end
 
-local function ts_disable(_, bufnr)
-  return vim.api.nvim_buf_line_count(bufnr) > 5000
-end
-
 local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
 local context = require("treesitter-context")
 local ts_utils = require 'nvim-treesitter.ts_utils'

@@ -1,7 +1,8 @@
+local api = vim.api
 local group_name = "vimrc_vimrc"
-vim.api.nvim_create_augroup(group_name, { clear = true })
+api.nvim_create_augroup(group_name, { clear = true })
 
-vim.api.nvim_create_autocmd({ "BufEnter", "FocusGained", "InsertLeave", "WinEnter" }, {
+api.nvim_create_autocmd({ "BufEnter", "FocusGained", "InsertLeave", "WinEnter" }, {
   group = group_name,
   pattern = "*",
   callback = function()
@@ -11,7 +12,7 @@ vim.api.nvim_create_autocmd({ "BufEnter", "FocusGained", "InsertLeave", "WinEnte
   end,
   once = false,
 })
-vim.api.nvim_create_autocmd({ "BufLeave", "FocusLost", "InsertEnter", "WinLeave" }, {
+api.nvim_create_autocmd({ "BufLeave", "FocusLost", "InsertEnter", "WinLeave" }, {
   group = group_name,
   pattern = "*",
   callback = function()
@@ -21,7 +22,7 @@ vim.api.nvim_create_autocmd({ "BufLeave", "FocusLost", "InsertEnter", "WinLeave"
   end,
   once = false,
 })
-vim.api.nvim_create_autocmd({ "QuickfixCmdPost" }, {
+api.nvim_create_autocmd({ "QuickfixCmdPost" }, {
   group = group_name,
   pattern = { "make", "grep", "grepadd", "vimgrep", "vimgrepadd" },
   callback = function()
@@ -29,7 +30,7 @@ vim.api.nvim_create_autocmd({ "QuickfixCmdPost" }, {
   end,
   once = false,
 })
-vim.api.nvim_create_autocmd({ "QuickfixCmdPost" }, {
+api.nvim_create_autocmd({ "QuickfixCmdPost" }, {
   group = group_name,
   pattern = { "lmake", "lgrep", "lgrepadd", "lvimgrep", "lvimgrepadd" },
   callback = function()
@@ -37,7 +38,7 @@ vim.api.nvim_create_autocmd({ "QuickfixCmdPost" }, {
   end,
   once = false,
 })
-vim.api.nvim_create_autocmd({ "FileType" }, {
+api.nvim_create_autocmd({ "FileType" }, {
   group = group_name,
   pattern = { "qf" },
   callback = function()
@@ -57,7 +58,7 @@ vim.api.nvim_create_autocmd({ "FileType" }, {
 -- 	end,
 -- 	once = false,
 -- })
-vim.api.nvim_create_autocmd({ "CmdwinEnter" }, {
+api.nvim_create_autocmd({ "CmdwinEnter" }, {
   group = group_name,
   pattern = "*",
   callback = function()
@@ -66,7 +67,7 @@ vim.api.nvim_create_autocmd({ "CmdwinEnter" }, {
   once = false,
 })
 -- Check timestamp more for 'autoread'.
-vim.api.nvim_create_autocmd({ "WinEnter", "FocusGained" }, {
+api.nvim_create_autocmd({ "WinEnter", "FocusGained" }, {
   group = group_name,
   pattern = "*",
   callback = function()
@@ -76,7 +77,7 @@ vim.api.nvim_create_autocmd({ "WinEnter", "FocusGained" }, {
   end,
   once = false,
 })
-vim.api.nvim_create_autocmd({ "TextYankPost" }, {
+api.nvim_create_autocmd({ "TextYankPost" }, {
   group = group_name,
   pattern = "*",
   callback = function()
@@ -100,7 +101,7 @@ vim.api.nvim_create_autocmd({ "TextYankPost" }, {
 --	end,
 --	once = false,
 --})
-vim.api.nvim_create_autocmd({ "BufWritePre" }, {
+api.nvim_create_autocmd({ "BufWritePre" }, {
   group = group_name,
   pattern = "*",
   callback = function()
@@ -129,7 +130,7 @@ vim.api.nvim_create_autocmd({ "BufWritePre" }, {
   end,
   once = false,
 })
-vim.api.nvim_create_autocmd({ "FileType" }, {
+api.nvim_create_autocmd({ "FileType" }, {
   group = group_name,
   pattern = { "gitcommit" },
   callback = function()
@@ -139,7 +140,7 @@ vim.api.nvim_create_autocmd({ "FileType" }, {
 })
 -- https://github.com/vim/vim/pull/9531
 -- LuaSnip insert mode overwrite register when I pasted
-vim.api.nvim_create_autocmd({ "ModeChanged" }, {
+api.nvim_create_autocmd({ "ModeChanged" }, {
   group = group_name,
   pattern = "*",
   callback = function()
@@ -156,7 +157,7 @@ vim.api.nvim_create_autocmd({ "ModeChanged" }, {
   end,
   once = false,
 })
-vim.api.nvim_create_autocmd({ "ModeChanged" }, {
+api.nvim_create_autocmd({ "ModeChanged" }, {
   group = group_name,
   pattern = "*:s",
   callback = function()
@@ -164,7 +165,7 @@ vim.api.nvim_create_autocmd({ "ModeChanged" }, {
   end,
   once = false,
 })
-vim.api.nvim_create_autocmd({ "ModeChanged" }, {
+api.nvim_create_autocmd({ "ModeChanged" }, {
   group = group_name,
   pattern = "s:*",
   callback = function()
@@ -174,8 +175,8 @@ vim.api.nvim_create_autocmd({ "ModeChanged" }, {
   end,
   once = false,
 })
-vim.api.nvim_create_augroup("neotree", {})
-vim.api.nvim_create_autocmd("UiEnter", {
+api.nvim_create_augroup("neotree", {})
+api.nvim_create_autocmd("UiEnter", {
   desc = "Open Neotree automatically",
   group = "neotree",
   callback = function()

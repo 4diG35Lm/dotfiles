@@ -3,19 +3,42 @@ if not status then
   return
 end
 
-local fn, uv, api = require("custom.core.utils").globals()
+local fn, _, api = require("custom.core.utils").globals()
+local palette = require("custom.core.utils.palette").nord
+local cmd = vim.cmd
 local keymap = vim.keymap
+local g = vim.g
+local o = vim.o
+local opt = vim.opt
+local tbl = vim.tbl_deep_extend
+local lsp = vim.lsp
+local diagnostic = vim.diagnostic
+-----------------------------------------------------------
+-- Define keymaps of Neovim and installed plugins.
+-----------------------------------------------------------
+-- =============================================================================
+-- = Keybindings =
+-- =============================================================================
+g.mapleader = " "
+g.maplocalleader = " "
+
+local opts = { noremap = true, silent = true }
+local function map(mode, lhs, rhs, opts)
+  local options = { noremap = true, silent = true }
+  if opts then
+    options = tbl("force", options, opts)
+  end
+  keymap.set(mode, lhs, rhs, options)
+end
 local Path = require "plenary.path"
 local action_layout = require "telescope.actions.layout"
 local actions = require "telescope.actions"
 local actions_state = require "telescope.actions.state"
 local conf = require("telescope.config").values
 local config = require "telescope.config"
-local fb_actions = require "telescope._extensions.file_browser.actions"
 local finders = require "telescope.finders"
 local from_entry = require "telescope.from_entry"
 local make_entry = require "telescope.make_entry"
-local palette = require("custom.core.utils.palette").nord
 local previewers = require "telescope.previewers"
 local telescope_builtin = require "telescope.builtin"
 local trouble = require "trouble.providers.telescope"
@@ -23,6 +46,7 @@ local utils = require "telescope.utils"
 
 local action_state = require "telescope.actions.state"
 local transform_mod = require("telescope.actions.mt").transform_mod
+local lazygit = require('telescope').load_extension('lazygit')
 
 api.create_autocmd("ColorScheme", {
   group = api.create_augroup("telescope-colors", {}),
@@ -67,25 +91,6 @@ end
 -- Lines
 keymap.set("n", "#", builtin "current_buffer_fuzzy_find" {})
 
--- Files
-keymap.set("n", "<Leader>fB", builtin "buffers" {})
-keymap.set("n", "<Leader>fb", function()
-  local cwd = fn.expand "%:h"
-  extensions("file_browser", "file_browser") { cwd = cwd == "" and nil or cwd }()
-end)
-keymap.set("n", "<Leader>ff", function()
-  local Path = require "plenary.path"
-  -- TODO: stopgap measure
-  if uv.cwd() == uv.os_homedir() then
-    vim.notify("find_files on $HOME is danger. Launch file_browser instead.", vim.log.levels.WARN)
-    extensions("file_browser", "file_browser") {}()
-  elseif Path:new(uv.cwd() .. "/.git"):is_dir() then
-    builtin "git_files" { show_untracked = true }()
-  else
-    builtin "find_files" { hidden = true }()
-  end
-end)
-
 local function input_grep_string(prompt, func)
   return function()
     vim.ui.input({ prompt = prompt }, function(input)
@@ -98,16 +103,16 @@ local function input_grep_string(prompt, func)
   end
 end
 
-keymap.set("n", "<Leader>f:", builtin "command_history" {})
-keymap.set("n", "<Leader>fG", builtin "grep_string" {})
-keymap.set("n", "<Leader>fH", builtin "help_tags" { lang = "en" })
-keymap.set("n", "<Leader>fN", extensions("node_modules", "list") {})
-keymap.set("n", "<Leader>fg", input_grep_string("Grep For ❯ ", builtin "grep_string"))
-keymap.set("n", "<Leader>fh", builtin "help_tags" {})
-keymap.set("n", "<Leader>fm", builtin "man_pages" { sections = { "ALL" } })
-keymap.set("n", "<Leader>fn", extensions("noice", "noice") {})
-keymap.set("n", "<Leader>fp", extensions("projects", "projects") {})
-keymap.set(
+map("n", "<Leader>f:", builtin "command_history" {})
+map("n", "<Leader>fG", builtin "grep_string" {})
+map("n", "<Leader>fH", builtin "help_tags" { lang = "en" })
+map("n", "<Leader>fN", extensions("node_modules", "list") {})
+map("n", "<Leader>fg", input_grep_string("Grep For ❯ ", builtin "grep_string"))
+map("n", "<Leader>fh", builtin "help_tags" {})
+map("n", "<Leader>fm", builtin "man_pages" { sections = { "ALL" } })
+map("n", "<Leader>fn", extensions("noice", "noice") {})
+map("n", "<Leader>fp", extensions("projects", "projects") {})
+map(
   "n",
   "<Leader>fq",
   extensions("ghq", "list") {
@@ -124,21 +129,11 @@ keymap.set(
     end,
   }
 )
-keymap.set("n", "<Leader>fr", builtin "resume" {})
+map("n", "<Leader>fr", builtin "resume" {})
 
-keymap.set(
-  "n",
-  "<Leader>fv",
-  extensions("file_browser", "file_browser") {
-    add_dirs = false,
-    depth = false,
-    hide_parent_dir = true,
-    path = "$VIMRUNTIME",
-  }
-)
-keymap.set("n", "<Leader>fy", extensions("yank_history", "yank_history") {})
+map("n", "<Leader>fy", extensions("yank_history", "yank_history") {})
 
-keymap.set("n", "<Leader>fz", function()
+map("n", "<Leader>fz", function()
   extensions("z", "list") {
     previewer = require("telescope.previewers.term_previewer").new_termopen_previewer {
       get_command = function(entry)
@@ -154,7 +149,7 @@ keymap.set("n", "<Leader>fz", function()
         local input = direction > 0 and string.char(0x05) or string.char(0x19)
         local count = math.abs(direction)
         api.win_call(fn.bufwinid(bufnr), function()
-          vim.cmd.normal { args = { count .. input }, bang = true }
+          cmd.normal { args = { count .. input }, bang = true }
         end)
       end,
     },
@@ -162,24 +157,12 @@ keymap.set("n", "<Leader>fz", function()
 end)
 
 -- Memo
-keymap.set("n", "<Leader>mm", extensions("memo", "list") {})
-keymap.set("n", "<Leader>mg", input_grep_string("Memo Grep For ❯ ", extensions("memo", "grep_string")))
-
--- LSP
-keymap.set("n", "<Leader>sr", builtin "lsp_references" {})
-keymap.set("n", "<Leader>sd", builtin "lsp_document_symbols" {})
-keymap.set("n", "<Leader>sw", builtin "lsp_workspace_symbols" {})
-keymap.set("n", "<Leader>sc", builtin "lsp_code_actions" {})
-
--- Git
-keymap.set("n", "<Leader>gc", builtin "git_commits" {})
-keymap.set("n", "<Leader>gb", builtin "git_bcommits" {})
-keymap.set("n", "<Leader>gr", builtin "git_branches" {})
-keymap.set("n", "<Leader>gs", builtin "git_status" {})
+map("n", "<Leader>mm", extensions("memo", "list") {})
+map("n", "<Leader>mg", input_grep_string("Memo Grep For ❯ ", extensions("memo", "grep_string")))
 
 -- Copied from telescope.nvim
-keymap.set("n", "q:", builtin "command_history" {})
-keymap.set(
+map("n", "q:", builtin "command_history" {})
+map(
   "c",
   "<A-r>",
   [[<C-\>e ]]
@@ -314,61 +297,6 @@ telescope.setup {
     case_mode = "smart_case",
   },
   extensions = {
-    file_browser = {
-      mappings = {
-        i = {
-          ["<A-d>"] = fb_actions.remove,
-          ["<A-e>"] = fb_actions.create, -- Original: <A-c>
-          ["<A-g>"] = fb_actions.goto_parent_dir, -- Original: <C-g>
-          ["<A-h>"] = fb_actions.toggle_hidden, -- Original: <C-h>
-          ["<A-m>"] = fb_actions.move,
-          ["<A-r>"] = fb_actions.rename,
-          ["<A-s>"] = fb_actions.toggle_all, -- Original: <C-s>
-          ["<A-y>"] = fb_actions.copy,
-          ["<C-a>"] = run_in_dir "find_files",
-          ["<C-d>"] = preview_scroll(3),
-          ["<C-e>"] = fb_actions.goto_home_dir,
-          ["<C-f>"] = fb_actions.toggle_browser,
-          ["<C-g>"] = run_in_dir "live_grep",
-          ["<C-n>"] = actions.select_horizontal,
-          ["<C-o>"] = fb_actions.open,
-          ["<C-s>"] = actions.select_horizontal,
-          ["<C-t>"] = fb_actions.change_cwd,
-          ["<C-u>"] = preview_scroll(-3),
-          ["<C-w>"] = fb_actions.goto_cwd,
-        },
-        n = {
-          ["<C-a>"] = run_in_dir "find_files",
-          ["<C-d>"] = preview_scroll(3),
-          ["<C-g>"] = run_in_dir "live_grep",
-          ["<C-u>"] = preview_scroll(-3),
-          ["c"] = fb_actions.create,
-          ["d"] = fb_actions.remove,
-          ["e"] = fb_actions.goto_home_dir,
-          ["f"] = fb_actions.toggle_browser,
-          ["g"] = fb_actions.goto_parent_dir,
-          ["h"] = fb_actions.toggle_hidden,
-          ["m"] = fb_actions.move,
-          ["o"] = fb_actions.open,
-          ["r"] = fb_actions.rename,
-          ["s"] = fb_actions.toggle_all,
-          ["t"] = fb_actions.change_cwd,
-          ["w"] = fb_actions.goto_cwd,
-          ["y"] = fb_actions.copy,
-        },
-      },
-      theme = "ivy",
-      hijack_netrw = true,
-      dir_icon_hl = "Directory",
-      icon_width = 2,
-      path_display = { "shorten", "smart" },
-      respect_gitignore = false,
-      layout_config = {
-        height = function(_, _, max_lines)
-          return math.max(math.floor(max_lines / 2), 5)
-        end,
-      },
-    },
     fzf = {
       fuzzy = true,
       override_generic_sorter = true,
@@ -377,7 +305,6 @@ telescope.setup {
     },
   },
 }
-telescope.load_extension "file_browser"
 -- This is needed to setup telescope-frecency.
 -- in this.
 telescope.load_extension "fzf"

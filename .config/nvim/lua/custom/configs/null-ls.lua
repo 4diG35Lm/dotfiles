@@ -9,13 +9,21 @@ local command_resolver = require "null-ls.helpers.command_resolver"
 local utils = require "null-ls.utils"
 local mason_null_ls = require "mason-null-ls"
 local function file_exists(fname)
-  local stat = vim.loop.fs_stat(vim.fn.expand(fname))
+  local stat = vim.uv.fs_stat(vim.fn.expand(fname))
   return (stat and stat.type) or false
 end
 
 mason_null_ls.setup {
   ensure_installed = { "prettier" },
   automatic_installation = true,
+  sources = {
+    nls.builtins.formatting.prettierd,
+    nls.builtins.diagnostics.rubocop,
+    nls.builtins.formatting.rubocop,
+    nls.builtins.formatting.black,
+    nls.builtins.formatting.goimports,
+  },
+  debug = false,
 }
 
 local function is_for_node(to_use)
@@ -327,3 +335,4 @@ function has_formatter(ft)
   local available = sources.get_available(ft, "NULL_LS_FORMATTING")
   return #available > 0
 end
+vim.keymap.set('n', '<leader>p', function() vim.lsp.buf.format { async = true } end)

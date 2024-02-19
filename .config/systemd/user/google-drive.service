@@ -1,0 +1,15 @@
+[Unit]
+Description=FUSE filesystem over Google Drive
+After=network.target
+
+[Service]
+User=a2c
+Group=a2c
+ExecStart=$HOME/.opam/default/bin/google-drive-ocamlfuse -label default $HOME/googledrive
+ExecStop=fusermount -u $HOME/googledrive
+Restart=always
+Type=forking
+
+[Install]
+WantedBy=default.target
+Alias=google-drive.service

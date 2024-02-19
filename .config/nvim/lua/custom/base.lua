@@ -1,43 +1,4 @@
-vim.cmd "autocmd!"
-
-vim.scriptencoding = "utf-8"
-
-vim.wo.number = true
-
--- LANG
-
-if vim.fn.has "unix" == 1 then
-  vim.env.LANG = "en_US.UTF-8"
-else
-  vim.env.LANG = "en"
-end
-vim.cmd [[ "language " .. os.getenv("LANG") ]]
-vim.o.langmenu = os.getenv "LANG"
-
-vim.o.encoding = "utf-8"
-vim.o.fileencodings = "ucs-bom,utf-8,euc-jp,iso-2022-jp,cp932,sjis,latin1"
-vim.o.fileformats = "unix,dos,mac"
--- vim.cmd [[ scriptencoding utf-8 ]]
-
--- debug level
--- vim.lsp.set_log_level('debug')
----@type integer
-local augroup = vim.api.nvim_create_augroup("vimrc", { clear = true })
----vimrc 専用の属性を格納するテーブル
-_G.vimrc = {
-  -- operator
-  op = {},
-  motion = {},
-  omnifunc = {},
-  state = {},
-}
-
-vim.cmd [[
-  filetype off
-  filetype plugin indent off
-]]
-
--- local utils = require("utils")
+--local utils = require("utils")
 -- Neovim-specific configuration
 --
 -- require("globals")
@@ -47,7 +8,7 @@ local cmd = vim.cmd
 local env = vim.env
 local fn = vim.fn
 local g = vim.g
--- local imap = utils.imap
+--local imap = utils.imap
 local indent = 2
 --local inoremap = utils.inoremap
 --local nmap = utils.nmap
@@ -61,22 +22,48 @@ local opt = vim.opt
 local wo = vim.wo
 -- local xmap = utils.xmap
 
--- create a completion_nvim table on _G which is visible via
--- v:lua from vimscript
-_G.completion_nvim = {}
-termcodes = vim.api.nvim_replace_termcodes
-function _G.completion_nvim.smart_pumvisible(vis_seq, not_vis_seq)
-  if fn.pumvisible() == 1 then
-    return termcodes(vis_seq)
-  else
-    return termcodes(not_vis_seq)
-  end
+cmd "autocmd!"
+
+vim.scriptencoding = "utf-8"
+
+vim.wo.number = true
+
+-- LANG
+
+if fn.has "unix" == 1 then
+  env.LANG = "en_US.UTF-8"
+else
+  env.LANG = "en"
 end
+cmd [[ "language " .. os.getenv("LANG") ]]
+o.langmenu = os.getenv "LANG"
+
+o.encoding = "utf-8"
+o.fileencodings = "ucs-bom,utf-8,euc-jp,iso-2022-jp,cp932,sjis,latin1"
+o.fileformats = "unix,dos,mac"
+--cmd [[ scriptencoding utf-8 ]]
+
+-- debug level
+-- vim.lsp.set_log_level('debug')
+---@type integer
+local augroup = api.nvim_create_augroup("vimrc", { clear = true })
+---vimrc 専用の属性を格納するテーブル
+_G.vimrc = {
+  -- operator
+  op = {},
+  motion = {},
+  omnifunc = {},
+  state = {},
+}
+
+cmd [[
+  filetype off
+  filetype plugin indent off
+]]
 
 -- General
 ----------------------------------------------------------------
 
-g.NERDTreeShowHidden = true
 g.airline_powerline_fonts = 1
 g.mapleader = " "
 g.neovide_iso_layout = true
@@ -90,6 +77,11 @@ g.ale_linters = {
   ["go"] = { "golangci-lint" },
   ["dockerfile"] = { "dockerfile_lint" },
 }
+g.loaded_netrw = 1
+g.loaded_netrwPlugin = 1
+
+-- set termguicolors to enable highlight groups
+opt.termguicolors = true
 
 -- disable default plugins
 local disable_plugins = {
@@ -132,24 +124,25 @@ cmd "syntax off"
 cmd "autocmd TermOpen * startinsert"
 
 cmd [[
-if executable('fcitx5')
+if executable('fcitx')
   let g:fcitx_state = 1
   augroup fcitx_savestate
     autocmd!
-    autocmd InsertLeave * let g:fcitx_state = str2nr(system('fcitx5-remote'))
-    autocmd InsertLeave * call system('fcitx5-remote -c')
-    autocmd InsertEnter * call system(g:fcitx_state == 1 ? 'fcitx5-remote -c': 'fcitx5-remote -o')
+    autocmd InsertLeave * let g:fcitx_state = str2nr(system('fcitx-remote'))
+    autocmd InsertLeave * call system('fcitx-remote -c')
+    autocmd InsertEnter * call system(g:fcitx_state == 1 ? 'fcitx-remote -c': 'fcitx-remote -o')
   augroup END
 endif
 ]]
 
 local vars = {
   python_host_prog = "/usr/bin/python2",
-  python3_host_prog = "$HOME/.anyenv/envs/pyenv/versions/3.11.0/bin/python",
+  python3_host_prog = "$HOME/.anyenv/envs/pyenv/shims/python",
+  python3_dir = "$HOME/.nvim/python3", 
   loaded_matchparen = 1,
 }
 
-for var, val in pairs(vars) do
+for var, val in ipairs(vars) do
   api.nvim_set_var(var, val)
 end
 
@@ -170,13 +163,3 @@ cmd [[highlight Normal ctermbg=none]]
 opt.runtimepath:remove "/etc/xdg/nvim"
 opt.runtimepath:remove "/etc/xdg/nvim/after"
 opt.runtimepath:remove "/usr/share/vim/vimfiles"
-
-vim.api.nvim_exec(
-  [[
-    function! DisableST()
-      return " "
-    endfunction
-    au BufEnter NvimTree setlocal statusline=%!DisableST()
-  ]],
-  false
-)
